@@ -7,7 +7,7 @@ import android.net.Uri;
 /**
  * Created by ARPaul on 07-01-2016.
  */
-public class FLCPConstants {
+public class GCCPConstants {
     public static final String CONTENT_AUTHORITY = "com.arpaul.geocare.dataAccess.ContentProviderHelper";
 
     public static final String DATABASE_NAME                    = "GeoCare.sqlite";

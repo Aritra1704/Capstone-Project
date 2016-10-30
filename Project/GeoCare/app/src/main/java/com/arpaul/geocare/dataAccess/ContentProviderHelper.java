@@ -53,14 +53,14 @@ public class ContentProviderHelper extends ContentProvider {
     static final UriMatcher uriMatcher;
     static {
         uriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
-        uriMatcher.addURI(FLCPConstants.PROVIDER_NAME, FLCPConstants.PREFERRED_LOCATION_TABLE_NAME, PREF_LOC_NAME);
-        uriMatcher.addURI(FLCPConstants.PROVIDER_NAME, FLCPConstants.PATH_RELATIONSHIP_JOIN, RELATIONSHIP_JOIN);
+        uriMatcher.addURI(GCCPConstants.PROVIDER_NAME, GCCPConstants.PREFERRED_LOCATION_TABLE_NAME, PREF_LOC_NAME);
+        uriMatcher.addURI(GCCPConstants.PROVIDER_NAME, GCCPConstants.PATH_RELATIONSHIP_JOIN, RELATIONSHIP_JOIN);
     }
 
     private DataBaseHelper mOpenHelper;
 
     public static Uri getContentUri(int type) {
-        String URL = FLCPConstants.CONTENT + FLCPConstants.PROVIDER_NAME;
+        String URL = GCCPConstants.CONTENT + GCCPConstants.PROVIDER_NAME;
         switch (type) {
             case RELATIONSHIP_JOIN:
                 URL += "";
@@ -122,7 +122,7 @@ public class ContentProviderHelper extends ContentProvider {
 
             long _id = db.insert(table, null, values);
             if (_id > 0) {
-                returnURI = FLCPConstants.buildLocationUri(_id);
+                returnURI = GCCPConstants.buildLocationUri(_id);
             } else {
                 throw new SQLException("Failed to insert row into: " + uri);
             }
@@ -141,7 +141,7 @@ public class ContentProviderHelper extends ContentProvider {
             String table = "";
             switch (uriMatcher.match(uri)) {
                 case PREF_LOC_NAME:
-                    table = FLCPConstants.PREFERRED_LOCATION_TABLE_NAME;
+                    table = GCCPConstants.PREFERRED_LOCATION_TABLE_NAME;
                     break;
                 case RELATIONSHIP_JOIN:
                     table = selection;
@@ -205,12 +205,12 @@ public class ContentProviderHelper extends ContentProvider {
     }
 
     private String getTableName(Uri uri){
-        String table = FLCPConstants.PREFERRED_LOCATION_TABLE_NAME;
+        String table = GCCPConstants.PREFERRED_LOCATION_TABLE_NAME;
         int uriType = uriMatcher.match(uri);
 
         switch (uriType) {
             case PREF_LOC_NAME:
-                table = FLCPConstants.PREFERRED_LOCATION_TABLE_NAME;
+                table = GCCPConstants.PREFERRED_LOCATION_TABLE_NAME;
                 break;
             default: {
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
@@ -225,23 +225,23 @@ public class ContentProviderHelper extends ContentProvider {
         final int match = uriMatcher.match(uri);
         switch (match) {
             case USERNAME: {
-                return FLCPConstants.CONTENT_USERNAME_TYPE;
+                return GCCPConstants.CONTENT_USERNAME_TYPE;
             }
             case USER_ID: {
-                return FLCPConstants.CONTENT_USERID_TYPE;
+                return GCCPConstants.CONTENT_USERID_TYPE;
             }
             case FARM_ID: {
-                return FLCPConstants.CONTENT_FARMID_TYPE;
+                return GCCPConstants.CONTENT_FARMID_TYPE;
             }
             case FARM_NAME: {
-                return FLCPConstants.CONTENT_FARMNAME_TYPE;
+                return GCCPConstants.CONTENT_FARMNAME_TYPE;
             }
             case SYNCLOG:
-                return FLCPConstants.CONTENT_SYNCLOG_TYPE;
+                return GCCPConstants.CONTENT_SYNCLOG_TYPE;
             case SPECIAL_EVENT:
-                return FLCPConstants.CONTENT_SPECIALEVENT_TYPE;
+                return GCCPConstants.CONTENT_SPECIALEVENT_TYPE;
             case IMAGES:
-                return FLCPConstants.CONTENT_IMAGE_TYPE;
+                return GCCPConstants.CONTENT_IMAGE_TYPE;
             default: {
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
             }

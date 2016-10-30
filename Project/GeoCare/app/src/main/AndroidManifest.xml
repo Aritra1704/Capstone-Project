@@ -38,6 +38,8 @@
             android:theme="@style/AppTheme.NoActionBar">
         </activity>
 
+        <service android:name=".geoFence.GeofenceTransitionsIntentService"/>
+
         <provider
             android:name=".dataAccess.ContentProviderHelper"
             android:authorities="com.arpaul.geocare.dataAccess.ContentProviderHelper"

@@ -19,8 +19,8 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 
 
     static final String CREATE_PREFERRED_LOCATION_DB_TABLE =
-            " CREATE TABLE IF NOT EXISTS " + FLCPConstants.PREFERRED_LOCATION_TABLE_NAME +
-                    " (" + FLCPConstants.TABLE_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+            " CREATE TABLE IF NOT EXISTS " + GCCPConstants.PREFERRED_LOCATION_TABLE_NAME +
+                    " (" + GCCPConstants.TABLE_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                     PrefLocationDO.LOCATIONID       + " INTEGER NOT NULL, " +
                     PrefLocationDO.LOCATIONNAME     + " VARCHAR NOT NULL, " +
                     PrefLocationDO.ADDRESS          + " VARCHAR NOT NULL, " +
@@ -28,7 +28,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
                     PrefLocationDO.LONGITUDE        + " DOUBLE NOT NULL);";
 
     DataBaseHelper(Context context){
-        super(context, FLCPConstants.DATABASE_NAME, null, FLCPConstants.DATABASE_VERSION);
+        super(context, GCCPConstants.DATABASE_NAME, null, GCCPConstants.DATABASE_VERSION);
     }
 
     @Override
@@ -38,7 +38,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        db.execSQL("DROP TABLE IF EXISTS " + FLCPConstants.PREFERRED_LOCATION_TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + GCCPConstants.PREFERRED_LOCATION_TABLE_NAME);
         onCreate(db);
     }
 }

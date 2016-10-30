@@ -9,7 +9,6 @@ import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.LinearLayout;
@@ -17,7 +16,7 @@ import android.widget.TextView;
 
 import com.arpaul.geocare.adapter.GeoLocationsAdapter;
 import com.arpaul.geocare.common.ApplicationInstance;
-import com.arpaul.geocare.dataAccess.FLCPConstants;
+import com.arpaul.geocare.dataAccess.GCCPConstants;
 import com.arpaul.geocare.dataObject.PrefLocationDO;
 import com.arpaul.utilitieslib.StringUtils;
 
@@ -94,7 +93,7 @@ public class FenceActivity extends BaseActivity implements LoaderManager.LoaderC
     public Loader onCreateLoader(int id, Bundle args) {
         switch (id){
             case ApplicationInstance.LOADER_FETCH_ALL_LOCATION :
-                return new CursorLoader(this, FLCPConstants.CONTENT_URI_PREF_LOC,
+                return new CursorLoader(this, GCCPConstants.CONTENT_URI_PREF_LOC,
                         new String[]{PrefLocationDO.LOCATIONID, PrefLocationDO.LOCATIONNAME, PrefLocationDO.ADDRESS,
                                 PrefLocationDO.LATITUDE, PrefLocationDO.LONGITUDE},
                         null,

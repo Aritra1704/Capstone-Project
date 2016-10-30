@@ -82,13 +82,13 @@ public class InsertLoader extends AsyncTaskLoader {
                     contentValues.put(PrefLocationDO.LONGITUDE, objPrefLocationDO.Longitude);
 
                     String address = "";
-                    int tryUpdate = context.getContentResolver().update(FLCPConstants.CONTENT_URI_PREF_LOC,
+                    int tryUpdate = context.getContentResolver().update(GCCPConstants.CONTENT_URI_PREF_LOC,
                             contentValues,
-                            PrefLocationDO.LOCATIONID + FLCPConstants.TABLE_QUES,
+                            PrefLocationDO.LOCATIONID + GCCPConstants.TABLE_QUES,
                             new String[]{objPrefLocationDO.LocationId + ""});
 
                     if (tryUpdate <= 0){
-                        Uri uri = context.getContentResolver().insert(FLCPConstants.CONTENT_URI_PREF_LOC, contentValues);
+                        Uri uri = context.getContentResolver().insert(GCCPConstants.CONTENT_URI_PREF_LOC, contentValues);
                         if(uri != null)
                             address = objPrefLocationDO.Address;
                     } else {

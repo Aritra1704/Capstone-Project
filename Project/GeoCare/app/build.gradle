@@ -31,4 +31,6 @@ dependencies {
     compile 'com.github.Aritra1704:UtilitiesJitPackLib:1.11'
     compile 'com.github.Aritra1704:CustomAlerts:1.03'
     compile 'com.github.Aritra1704:LocationFinder:1.0.6'
+
+    compile 'com.afollestad.material-dialogs:core:0.8.5.9'
 }
