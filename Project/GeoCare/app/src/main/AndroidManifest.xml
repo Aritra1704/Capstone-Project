@@ -39,6 +39,20 @@
         </activity>
 
         <service android:name=".geoFence.GeofenceTransitionsIntentService"/>
+        <service android:name=".geoFence.GeoFenceNotiService"/>
+
+        <service
+            android:name=".gcmService.GCMFirebaseMessagingService">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT"/>
+            </intent-filter>
+        </service>
+        <service
+            android:name=".gcmService.GCMFirebaseInstanceIDService">
+            <intent-filter>
+                <action android:name="com.google.firebase.INSTANCE_ID_EVENT"/>
+            </intent-filter>
+        </service>
 
         <provider
             android:name=".dataAccess.ContentProviderHelper"

@@ -12,6 +12,7 @@ public class AppPreference {
     private SharedPreferences.Editor edit;
 
     public static final String PREF_LOC 			   =	"PREF_LOC";
+    public static final String GCM_TOKEN               =	"GCM_TOKEN";
 
     public AppPreference(Context context)
     {

@@ -60,7 +60,7 @@ public class GeoFenceActivity extends BaseActivity implements
         LoaderManager.LoaderCallbacks {
 
     private View llGeoFencActivity;
-    protected ArrayList<Geofence> mGeofenceList;
+//    protected ArrayList<Geofence> mGeofenceList;
 
     private final String LOG_TAG ="FenceLocator";
 
@@ -72,7 +72,6 @@ public class GeoFenceActivity extends BaseActivity implements
     private boolean ispermissionGranted = false;
     private ArrayList<PrefLocationDO> arrPrefLocationDO = new ArrayList<>();
     private LocationRequest mLocationRequest;
-    private PendingIntent mGeofencePendingIntent;
 
     @Override
     public void initialize() {
@@ -85,12 +84,9 @@ public class GeoFenceActivity extends BaseActivity implements
     }
 
     private void bindControls(){
-        mGeofenceList = new ArrayList<Geofence>();
-
-        buildGoogleApiClient();
 
         if(new PermissionUtils().checkPermission(this, new String[]{
-                android.Manifest.permission.ACCESS_FINE_LOCATION, android.Manifest.permission.ACCESS_COARSE_LOCATION}) != 0){
+                Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}) != 0){
             new PermissionUtils().verifyLocation(this,new String[]{
                     Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION});
         } else {
@@ -107,70 +103,6 @@ public class GeoFenceActivity extends BaseActivity implements
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
                 .build();
-    }
-
-    public void addGeofencesButtonHandler() {
-        if (!mGoogleApiClient.isConnected()) {
-            Toast.makeText(this, getString(R.string.not_connected), Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        try {
-            mGeofencePendingIntent = getGeofencePendingIntent();
-            LocationServices.GeofencingApi.addGeofences(
-                    mGoogleApiClient,
-                    // The GeofenceRequest object.
-                    getGeofencingRequest(),
-                    // A pending intent that that is reused when calling removeGeofences(). This
-                    // pending intent is used to generate an intent when a matched geofence
-                    // transition is observed.
-                    mGeofencePendingIntent
-            ).setResultCallback(this); // Result processed in onResult().
-
-            showLocations();
-        } catch (SecurityException securityException) {
-            // Catch exception generated if the app does not use ACCESS_FINE_LOCATION permission.
-        }
-    }
-
-    private PendingIntent getGeofencePendingIntent() {
-        // Reuse the PendingIntent if we already have it.
-        if (mGeofencePendingIntent != null) {
-            return mGeofencePendingIntent;
-        }
-
-        Intent intent = new Intent(this, GeofenceTransitionsIntentService.class);
-        // We use FLAG_UPDATE_CURRENT so that we get the same pending intent back when
-        // calling addGeofences() and removeGeofences().
-        return PendingIntent.getService(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-    }
-
-    public void populateGeofenceList() {
-        for(PrefLocationDO objPrefLocationDO : arrPrefLocationDO) {
-            mGeofenceList.add(new Geofence.Builder()
-                    // Set the request ID of the geofence. This is a string to identify this geofence.
-                    .setRequestId(objPrefLocationDO.LocationId + "")
-
-                    // Set the circular region of this geofence.
-                    .setCircularRegion(
-                            objPrefLocationDO.Latitude,
-                            objPrefLocationDO.Longitude,
-                            AppConstant.GEOFENCE_RADIUS_IN_METERS
-                    )
-
-                    // Set the expiration duration of the geofence. This geofence gets automatically
-                    // removed after this period of time.
-                    .setExpirationDuration(AppConstant.GEOFENCE_EXPIRATION_IN_MILLISECONDS)
-
-                    // Set the transition types of interest. Alerts are only generated for these
-                    // transition. We track entry and exit transitions in this sample.
-                    .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_EXIT)
-
-                    // Create the geofence.
-                    .build());
-        }
-
-        addGeofencesButtonHandler();
     }
 
     @Override
@@ -192,11 +124,6 @@ public class GeoFenceActivity extends BaseActivity implements
     @Override
     protected void onDestroy() {
         super.onDestroy();
-//        LocationServices.GeofencingApi.removeGeofences(
-//                mGoogleApiClient,
-//                // This is the same pending intent that was used in addGeofences().
-//                getGeofencePendingIntent()
-//        ).setResultCallback(this); // Result processed in onResult().
     }
 
     @Override
@@ -315,9 +242,6 @@ public class GeoFenceActivity extends BaseActivity implements
 
                             arrPrefLocationDO.add(objPrefLocationDO);
                         } while (cursor.moveToNext());
-
-                        // Get the geofences used. Geofence data is hard coded in this sample.
-                        populateGeofenceList();
                     } else {
                         showCurrentLocation();
                     }
@@ -389,13 +313,6 @@ public class GeoFenceActivity extends BaseActivity implements
         }
 
         showCurrentLocation();
-    }
-
-    private GeofencingRequest getGeofencingRequest() {
-        GeofencingRequest.Builder builder = new GeofencingRequest.Builder();
-        builder.setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_ENTER);
-        builder.addGeofences(mGeofenceList);
-        return builder.build();
     }
 
     private void initialiseControls(){

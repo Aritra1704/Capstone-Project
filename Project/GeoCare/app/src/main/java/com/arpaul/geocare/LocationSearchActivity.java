@@ -29,6 +29,7 @@ import com.arpaul.geocare.dataAccess.GCCPConstants;
 import com.arpaul.geocare.dataAccess.InsertDataType;
 import com.arpaul.geocare.dataAccess.InsertLoader;
 import com.arpaul.geocare.dataObject.PrefLocationDO;
+import com.arpaul.geocare.geoFence.GeoFenceNotiService;
 import com.arpaul.gpslibrary.fetchAddressGeoCode.AddressConstants;
 import com.arpaul.gpslibrary.fetchAddressGeoCode.AddressDO;
 import com.arpaul.gpslibrary.fetchAddressGeoCode.FetchAddressLoader;
@@ -87,11 +88,10 @@ public class LocationSearchActivity extends BaseActivity implements GPSCallback,
         gpsUtills.setListner(LocationSearchActivity.this);
 
         if(new PermissionUtils().checkPermission(this, new String[]{
-                android.Manifest.permission.ACCESS_FINE_LOCATION, android.Manifest.permission.ACCESS_COARSE_LOCATION}) != 0){
+                Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}) != 0){
             new PermissionUtils().verifyLocation(this,new String[]{
                     Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION});
-        }
-        else{
+        } else{
             createGPSUtils();
         }
 
@@ -434,6 +434,7 @@ public class LocationSearchActivity extends BaseActivity implements GPSCallback,
                 if(data instanceof String){
                     if(data != null && !TextUtils.isEmpty((String) data)){
                         showCustomDialog(getString(R.string.success),getString(R.string.location_successfuly_added),null,null,getString(R.string.location_successfuly_added), CustomPopupType.DIALOG_SUCCESS,false);
+                        startService(new Intent(LocationSearchActivity.this, GeoFenceNotiService.class));
                         new Handler().postDelayed(new Runnable() {
 
                             @Override

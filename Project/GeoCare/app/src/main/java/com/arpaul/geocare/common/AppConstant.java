@@ -20,4 +20,6 @@ public class AppConstant {
     public static final long GEOFENCE_EXPIRATION_IN_MILLISECONDS = GEOFENCE_EXPIRATION_IN_HOURS * 60 * 60 * 1000;
 
     public static final long LOCATION_UPDATES_IN_SECONDS = 60;
+
+    public static final String ACTION_REFRESH      = "ACTION_REFRESH";
 }
