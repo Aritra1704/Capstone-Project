@@ -85,6 +85,9 @@ public class FenceActivity extends BaseActivity implements LoaderManager.LoaderC
         if (id == R.id.action_settings) {
             startActivity(new Intent(FenceActivity.this, SettingsActivity.class));
             return true;
+        } else if (id == R.id.action_signin) {
+            startActivity(new Intent(FenceActivity.this, SignInActivity.class));
+            return true;
         }
 
         return super.onOptionsItemSelected(item);

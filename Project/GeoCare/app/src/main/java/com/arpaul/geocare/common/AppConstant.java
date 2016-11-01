@@ -1,5 +1,7 @@
 package com.arpaul.geocare.common;
 
+import com.google.firebase.auth.FirebaseAuth;
+
 /**
  * Created by Aritra on 20-09-2016.
  */
@@ -22,4 +24,5 @@ public class AppConstant {
     public static final long LOCATION_UPDATES_IN_SECONDS = 60;
 
     public static final String ACTION_REFRESH      = "ACTION_REFRESH";
+    public static FirebaseAuth mFirebaseAuth;;
 }
