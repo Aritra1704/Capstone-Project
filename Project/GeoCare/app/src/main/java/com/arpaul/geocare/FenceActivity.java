@@ -83,6 +83,7 @@ public class FenceActivity extends BaseActivity implements LoaderManager.LoaderC
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            startActivity(new Intent(FenceActivity.this, SettingsActivity.class));
             return true;
         }
 
