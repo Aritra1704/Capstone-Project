@@ -130,6 +130,6 @@
     <string name="pref_ringtone_silent">Silent</string>
 
     <string name="pref_title_vibrate">Vibrate</string>
-
+    <!--API_KEY-->
     <string name="server_client_id">API_KEY</string>
 </resources>
