@@ -26,6 +26,7 @@
     <!-- Transition type strings -->
     <string name="geofence_transition_entered">Entered</string>
     <string name="geofence_transition_exited">Exited</string>
+    <string name="geofence_currently_in">Currently in</string>
     <string name="unknown_geofence_transition">Unknown Transition</string>
 
     <!-- Error strings -->

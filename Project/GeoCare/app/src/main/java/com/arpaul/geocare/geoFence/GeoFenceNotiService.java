@@ -43,7 +43,7 @@ public class GeoFenceNotiService extends Service implements GoogleApiClient.Conn
         ResultCallback<Status> {
 
     protected ArrayList<Geofence> mGeofenceList;
-    private final String LOG_TAG ="GeoFenceNotiService";
+    private final String LOG_TAG = "GeoFenceNotiService";
     private ArrayList<PrefLocationDO> arrPrefLocationDO = new ArrayList<>();
     private PendingIntent mGeofencePendingIntent;
     private GoogleApiClient mGoogleApiClient;
@@ -61,7 +61,7 @@ public class GeoFenceNotiService extends Service implements GoogleApiClient.Conn
 
         buildGoogleApiClient();
 
-        if(mGoogleApiClient != null)
+        if (mGoogleApiClient != null)
             mGoogleApiClient.connect();
 
         return START_NOT_STICKY;
@@ -88,7 +88,7 @@ public class GeoFenceNotiService extends Service implements GoogleApiClient.Conn
                 null,
                 null);
 
-        if(cursor != null && cursor.moveToFirst()){
+        if (cursor != null && cursor.moveToFirst()) {
             PrefLocationDO objPrefLocationDO = null;
             arrPrefLocationDO.clear();
             do {
@@ -122,7 +122,7 @@ public class GeoFenceNotiService extends Service implements GoogleApiClient.Conn
     @Override
     public void onResult(@NonNull Status status) {
         if (status.isSuccess()) {
-            LogUtils.infoLog(LOG_TAG,"Geofences Added");
+            LogUtils.infoLog(LOG_TAG, "Geofences Added");
         } else {
             // Get the status code for the error and log it using a user-friendly message.
             String errorMessage = GeofenceErrorMessages.getErrorString(this, status.getStatusCode());
@@ -172,10 +172,10 @@ public class GeoFenceNotiService extends Service implements GoogleApiClient.Conn
     }
 
     public void populateGeofenceList() {
-        for(PrefLocationDO objPrefLocationDO : arrPrefLocationDO) {
+        for (PrefLocationDO objPrefLocationDO : arrPrefLocationDO) {
             mGeofenceList.add(new Geofence.Builder()
                     // Set the request ID of the geofence. This is a string to identify this geofence.
-                    .setRequestId(objPrefLocationDO.LocationId + "")
+                    .setRequestId(objPrefLocationDO.LocationName)
 
                     // Set the circular region of this geofence.
                     .setCircularRegion(
@@ -190,7 +190,9 @@ public class GeoFenceNotiService extends Service implements GoogleApiClient.Conn
 
                     // Set the transition types of interest. Alerts are only generated for these
                     // transition. We track entry and exit transitions in this sample.
-                    .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_EXIT)
+                    .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER |
+                            Geofence.GEOFENCE_TRANSITION_DWELL |
+                            Geofence.GEOFENCE_TRANSITION_EXIT)
 
                     // Create the geofence.
                     .build());
@@ -199,7 +201,7 @@ public class GeoFenceNotiService extends Service implements GoogleApiClient.Conn
         addGeofencesButtonHandler();
     }
 
-    private void removeGeoFenceList(){
+    private void removeGeoFenceList() {
         LocationServices.GeofencingApi.removeGeofences(
                 mGoogleApiClient,
                 // This is the same pending intent that was used in addGeofences().

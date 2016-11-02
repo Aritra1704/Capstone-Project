@@ -47,6 +47,7 @@ public class GeofenceTransitionsIntentService extends IntentService {
 
         // Test that the reported transition was of interest.
         if (geofenceTransition == Geofence.GEOFENCE_TRANSITION_ENTER ||
+                geofenceTransition == Geofence.GEOFENCE_TRANSITION_DWELL ||
                 geofenceTransition == Geofence.GEOFENCE_TRANSITION_EXIT) {
 
             // Get the geofences that were triggered. A single event can trigger
@@ -90,6 +91,8 @@ public class GeofenceTransitionsIntentService extends IntentService {
                 return getString(R.string.geofence_transition_entered);
             case Geofence.GEOFENCE_TRANSITION_EXIT:
                 return getString(R.string.geofence_transition_exited);
+            case Geofence.GEOFENCE_TRANSITION_DWELL:
+                return getString(R.string.geofence_currently_in);
             default:
                 return getString(R.string.unknown_geofence_transition);
         }
