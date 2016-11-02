@@ -191,7 +191,7 @@ public class GeoFenceNotiService extends Service implements GoogleApiClient.Conn
                     // Set the transition types of interest. Alerts are only generated for these
                     // transition. We track entry and exit transitions in this sample.
                     .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER |
-                            Geofence.GEOFENCE_TRANSITION_DWELL |
+//                            Geofence.GEOFENCE_TRANSITION_DWELL |
                             Geofence.GEOFENCE_TRANSITION_EXIT)
 
                     // Create the geofence.
