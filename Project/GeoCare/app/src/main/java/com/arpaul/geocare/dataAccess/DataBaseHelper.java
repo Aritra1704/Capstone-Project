@@ -37,7 +37,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
                     GeoFenceLocationDO.LATITUDE         + " DOUBLE NOT NULL, " +
                     GeoFenceLocationDO.LONGITUDE        + " DOUBLE NOT NULL," +
                     GeoFenceLocationDO.EVENT            + " VARCHAR NOT NULL, " +
-                    GeoFenceLocationDO.OCCURANCETIME    + " VARCHAR NOT NULL, " +
+                    GeoFenceLocationDO.OCCURANCETIME    + " VARCHAR NOT NULL " +
                     ");";
 
     DataBaseHelper(Context context){
