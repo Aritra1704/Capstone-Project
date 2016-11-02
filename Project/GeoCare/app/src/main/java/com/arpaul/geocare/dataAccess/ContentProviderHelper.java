@@ -27,21 +27,9 @@ public class ContentProviderHelper extends ContentProvider {
 
     public static final int USERNAME                                = 1;
     public static final int USER_ID                                 = 2;
-    public static final int FARM_ID                                 = 3;
-    public static final int FARM_NAME                               = 4;
-    public static final int FARMTOUR_ID                             = 5;
-    public static final int FARMTOUR_NAME                           = 6;
+    public static final int GEOFENCE_LOC                            = 3;
     public static final int PREF_LOC_NAME                           = 7;
-    public static final int CT_HEADER                               = 8;
-    public static final int CT_DETAIL                               = 9;
-    public static final int TOURS                                   = 10;
-    public static final int FEATURES                                = 11;
-    public static final int PRODUCTS                                = 12;
-    public static final int FEATUREPARTICIPANTS                     = 13;
-    public static final int PRODUCTPARTICIPANT                      = 14;
-    public static final int FTPARTICIPANT                           = 15;
     public static final int SYNCLOG                                 = 16;
-    public static final int SPECIAL_EVENT                           = 17;
     public static final int IMAGES                                  = 18;
     public static final int FEEDBACK                                = 19;
 
@@ -53,7 +41,7 @@ public class ContentProviderHelper extends ContentProvider {
     static final UriMatcher uriMatcher;
     static {
         uriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
-        uriMatcher.addURI(GCCPConstants.PROVIDER_NAME, GCCPConstants.PREFERRED_LOCATION_TABLE_NAME, PREF_LOC_NAME);
+        uriMatcher.addURI(GCCPConstants.PROVIDER_NAME, GCCPConstants.SAVED_LOCATION_TABLE_NAME, PREF_LOC_NAME);
         uriMatcher.addURI(GCCPConstants.PROVIDER_NAME, GCCPConstants.PATH_RELATIONSHIP_JOIN, RELATIONSHIP_JOIN);
     }
 
@@ -141,7 +129,10 @@ public class ContentProviderHelper extends ContentProvider {
             String table = "";
             switch (uriMatcher.match(uri)) {
                 case PREF_LOC_NAME:
-                    table = GCCPConstants.PREFERRED_LOCATION_TABLE_NAME;
+                    table = GCCPConstants.SAVED_LOCATION_TABLE_NAME;
+                    break;
+                case GEOFENCE_LOC:
+                    table = GCCPConstants.GEOFENCE_LOCATION_TABLE_NAME;
                     break;
                 case RELATIONSHIP_JOIN:
                     table = selection;
@@ -205,12 +196,15 @@ public class ContentProviderHelper extends ContentProvider {
     }
 
     private String getTableName(Uri uri){
-        String table = GCCPConstants.PREFERRED_LOCATION_TABLE_NAME;
+        String table = GCCPConstants.SAVED_LOCATION_TABLE_NAME;
         int uriType = uriMatcher.match(uri);
 
         switch (uriType) {
             case PREF_LOC_NAME:
-                table = GCCPConstants.PREFERRED_LOCATION_TABLE_NAME;
+                table = GCCPConstants.SAVED_LOCATION_TABLE_NAME;
+                break;
+            case GEOFENCE_LOC:
+                table = GCCPConstants.GEOFENCE_LOCATION_TABLE_NAME;
                 break;
             default: {
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
@@ -224,22 +218,14 @@ public class ContentProviderHelper extends ContentProvider {
 
         final int match = uriMatcher.match(uri);
         switch (match) {
-            case USERNAME: {
+            case USERNAME:
                 return GCCPConstants.CONTENT_USERNAME_TYPE;
-            }
-            case USER_ID: {
+            case USER_ID:
                 return GCCPConstants.CONTENT_USERID_TYPE;
-            }
-            case FARM_ID: {
+            case GEOFENCE_LOC:
                 return GCCPConstants.CONTENT_FARMID_TYPE;
-            }
-            case FARM_NAME: {
-                return GCCPConstants.CONTENT_FARMNAME_TYPE;
-            }
             case SYNCLOG:
                 return GCCPConstants.CONTENT_SYNCLOG_TYPE;
-            case SPECIAL_EVENT:
-                return GCCPConstants.CONTENT_SPECIALEVENT_TYPE;
             case IMAGES:
                 return GCCPConstants.CONTENT_IMAGE_TYPE;
             default: {

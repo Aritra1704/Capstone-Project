@@ -19,11 +19,15 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.android.internal.util.Predicate;
 import com.arpaul.customalertlibrary.dialogs.CustomDialog;
 import com.arpaul.customalertlibrary.popups.statingDialog.CustomPopupType;
 import com.arpaul.customalertlibrary.popups.statingDialog.PopupListener;
 import com.arpaul.geocare.common.AppPreference;
 import com.arpaul.utilitieslib.UnCaughtException;
+
+import java.util.ArrayList;
+import java.util.Collection;
 
 public abstract class BaseActivity extends AppCompatActivity implements PopupListener {
 
@@ -112,10 +116,23 @@ public abstract class BaseActivity extends AppCompatActivity implements PopupLis
         runOnUiThread(new RunShowDialog(title,message,okButton,noButton,from, isCancelable));
     }
 
+    /**
+     * Shows Dialog with user defined buttons.
+     * @param title
+     * @param message
+     * @param okButton
+     * @param noButton
+     * @param from
+     * @param dislogType
+     * @param isCancelable
+     */
     public void showCustomDialog(final String title, final String message, final String okButton, final String noButton, final String from, CustomPopupType dislogType, boolean isCancelable){
         runOnUiThread(new RunShowDialog(title,message,okButton,noButton,from, dislogType, isCancelable));
     }
 
+    /**
+     * Hides custom Dialog if open.
+     */
     public void hideCustomDialog() {
         runOnUiThread(new Runnable() {
             @Override
@@ -221,6 +238,20 @@ public abstract class BaseActivity extends AppCompatActivity implements PopupLis
             vg = (ViewGroup) v.getRootView();
 
         return vg;
+    }
+
+    public static <T> Collection<T> filter(Collection<T> col, Predicate<T> predicate) {
+
+        Collection<T> result = new ArrayList<T>();
+        if(col!=null)
+        {
+            for (T element : col) {
+                if (predicate.apply(element)) {
+                    result.add(element);
+                }
+            }
+        }
+        return result;
     }
 
     public static void applyTypeface(ViewGroup v, Typeface f, int style) {

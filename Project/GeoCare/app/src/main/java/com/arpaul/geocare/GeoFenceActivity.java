@@ -1,11 +1,11 @@
 package com.arpaul.geocare;
 
 import android.Manifest;
-import android.app.PendingIntent;
-import android.content.Intent;
+import android.content.Context;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.location.Location;
+import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -14,16 +14,18 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import com.android.internal.util.Predicate;
+import com.arpaul.customalertlibrary.popups.statingDialog.CustomPopupType;
 import com.arpaul.geocare.common.AppConstant;
 import com.arpaul.geocare.common.ApplicationInstance;
 import com.arpaul.geocare.dataAccess.GCCPConstants;
 import com.arpaul.geocare.dataObject.PrefLocationDO;
 import com.arpaul.geocare.geoFence.GeofenceErrorMessages;
-import com.arpaul.geocare.geoFence.GeofenceTransitionsIntentService;
 import com.arpaul.utilitieslib.ColorUtils;
 import com.arpaul.utilitieslib.LogUtils;
 import com.arpaul.utilitieslib.PermissionUtils;
@@ -32,8 +34,6 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
-import com.google.android.gms.location.Geofence;
-import com.google.android.gms.location.GeofencingRequest;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
@@ -42,11 +42,13 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.ArrayList;
+import java.util.Collection;
 
 /**
  * Created by ARPaul on 11-09-2016.
@@ -72,6 +74,8 @@ public class GeoFenceActivity extends BaseActivity implements
     private boolean ispermissionGranted = false;
     private ArrayList<PrefLocationDO> arrPrefLocationDO = new ArrayList<>();
     private LocationRequest mLocationRequest;
+    private float mZoom = 0.0f;
+    private final String FILTER_CIRCLE = "FILTER_CIRCLE";
 
     @Override
     public void initialize() {
@@ -103,6 +107,12 @@ public class GeoFenceActivity extends BaseActivity implements
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
                 .build();
+
+        LocationManager locationManager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
+        boolean isGpsProviderEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+        if(!isGpsProviderEnabled) {
+            showCustomDialog(getString(R.string.gpssettings),getString(R.string.gps_not_enabled),getString(R.string.settings),getString(R.string.cancel),getString(R.string.settings), CustomPopupType.DIALOG_ALERT,false);
+        }
     }
 
     @Override
@@ -171,7 +181,7 @@ public class GeoFenceActivity extends BaseActivity implements
 
         currentLatLng = new LatLng(location.getLatitude(), location.getLongitude());
 
-        Toast.makeText(GeoFenceActivity.this, "Lat: "+currentLatLng.latitude+" Lon: "+currentLatLng.longitude, Toast.LENGTH_SHORT).show();
+//        Toast.makeText(GeoFenceActivity.this, "Lat: "+currentLatLng.latitude+" Lon: "+currentLatLng.longitude, Toast.LENGTH_SHORT).show();
         showLocations();
     }
 
@@ -206,6 +216,16 @@ public class GeoFenceActivity extends BaseActivity implements
         else if(ispermissionGranted) {
             showSettingsAlert();
         }
+
+        mMap.setOnCircleClickListener(new GoogleMap.OnCircleClickListener() {
+            @Override
+            public void onCircleClick(Circle circle) {
+                if(circle != null) {
+                    LatLng latLngFarm = circle.getCenter();
+                    filterCircle(latLngFarm);
+                }
+            }
+        });
     }
 
     @Override
@@ -276,7 +296,8 @@ public class GeoFenceActivity extends BaseActivity implements
                 markerOptions.title("Your Location");
                 mMap.addMarker(markerOptions);
                 mMap.addMarker(markerOptions).showInfoWindow();
-                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng,16.0f));
+                mZoom = 15.0f;
+                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng,mZoom));
             }
         } else {
             Toast.makeText(this, "Unable to fetch your current location please try again.", Toast.LENGTH_SHORT).show();
@@ -296,10 +317,11 @@ public class GeoFenceActivity extends BaseActivity implements
                     markerOptions.title(objPrefLocationDO.LocationName);
                     mMap.addMarker(markerOptions);
 //                    mMap.addMarker(markerOptions).showInfoWindow();
-                    mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLngFarm,15.0f));
+                    mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLngFarm,mZoom));
 
                     //Instantiates a new CircleOptions object +  center/radius
                     CircleOptions circleOptions = new CircleOptions()
+                            .clickable(true)
                             .center(latLngFarm)
                             .radius(AppConstant.GEOFENCE_RADIUS_IN_METERS)
                             .fillColor(ColorUtils.getColor(GeoFenceActivity.this, R.color.color_Light_Pink))
@@ -313,6 +335,42 @@ public class GeoFenceActivity extends BaseActivity implements
         }
 
         showCurrentLocation();
+    }
+
+    private ArrayList<PrefLocationDO> tmpSearched = new ArrayList<>();
+    private void filterCircle(final LatLng searchCircle){
+        synchronized (FILTER_CIRCLE){
+            Predicate<PrefLocationDO> searchFarms = null;
+                searchFarms = new Predicate<PrefLocationDO>() {
+                    @Override
+                    public boolean apply(PrefLocationDO farmDO) {
+                        if(farmDO.Latitude == searchCircle.latitude && farmDO.Longitude == searchCircle.longitude) {
+                            return true;
+                        }
+                        return false;
+                    }
+                };
+
+            if(tmpSearched != null)
+                tmpSearched.clear();
+
+            if (searchFarms!=null){
+                Collection<PrefLocationDO> filteredResult = filter(arrPrefLocationDO, searchFarms);
+                if (filteredResult != null && filteredResult.size() > 0) {
+                    tmpSearched.addAll((ArrayList<PrefLocationDO>) filteredResult);
+                }
+            } else {
+                tmpSearched = (ArrayList<PrefLocationDO>) arrPrefLocationDO.clone();
+            }
+
+            if(tmpSearched != null && tmpSearched.size() > 0) {
+                PrefLocationDO objPrefLocationDO = tmpSearched.get(0);
+                String messageBody = "Address: " + objPrefLocationDO.Address +
+                        "\nLat: " + objPrefLocationDO.Latitude + " Long: " + objPrefLocationDO.Longitude +
+                        "\nRadius: " + AppConstant.GEOFENCE_RADIUS_IN_METERS;
+                showCustomDialog(objPrefLocationDO.LocationName,messageBody,getString(R.string.ok),null,"GeoFenceCircle", CustomPopupType.DIALOG_SUCCESS,false);
+            }
+        }
     }
 
     private void initialiseControls(){

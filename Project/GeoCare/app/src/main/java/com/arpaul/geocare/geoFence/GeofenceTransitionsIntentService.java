@@ -3,6 +3,7 @@ package com.arpaul.geocare.geoFence;
 import android.app.IntentService;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.BitmapFactory;
@@ -14,6 +15,9 @@ import android.util.Log;
 
 import com.arpaul.geocare.GeoFenceActivity;
 import com.arpaul.geocare.R;
+import com.arpaul.geocare.dataObject.GeoFenceLocationDO;
+import com.arpaul.geocare.dataObject.PrefLocationDO;
+import com.arpaul.utilitieslib.CalendarUtils;
 import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.GeofencingEvent;
 
@@ -81,6 +85,15 @@ public class GeofenceTransitionsIntentService extends IntentService {
             triggeringGeofencesIdsList.add(geofence.getRequestId());
         }
         String triggeringGeofencesIdsString = TextUtils.join(", ", triggeringGeofencesIdsList);
+
+//        ContentValues cValues = new ContentValues();
+//        cValues.put(GeoFenceLocationDO.LOCATIONID, objPrefLocationDO.LocationId);
+//        cValues.put(GeoFenceLocationDO.LOCATIONNAME, triggeringGeofencesIdsString);
+//        cValues.put(GeoFenceLocationDO.ADDRESS, objPrefLocationDO.Address);
+//        cValues.put(GeoFenceLocationDO.LATITUDE, objPrefLocationDO.Latitude);
+//        cValues.put(GeoFenceLocationDO.LONGITUDE, objPrefLocationDO.Longitude);
+//        cValues.put(GeoFenceLocationDO.EVENT, objPrefLocationDO.Latitude);
+//        cValues.put(GeoFenceLocationDO.OCCURANCETIME, CalendarUtils.getDateinPattern(CalendarUtils.DATE_TIME_FORMAT_T));
 
         return geofenceTransitionString + ": " + triggeringGeofencesIdsString;
     }

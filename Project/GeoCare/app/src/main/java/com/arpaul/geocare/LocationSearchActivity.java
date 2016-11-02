@@ -43,7 +43,6 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 
 /**
@@ -52,8 +51,11 @@ import com.google.android.gms.maps.model.LatLng;
 
 public class LocationSearchActivity extends BaseActivity implements GPSCallback,
         OnMapReadyCallback,
-        GoogleMap.OnCameraChangeListener,
-        LoaderManager.LoaderCallbacks {
+//        GoogleMap.OnCameraChangeListener,
+        LoaderManager.LoaderCallbacks,
+//        GoogleMap.OnCameraMoveListener,
+        GoogleMap.OnCameraIdleListener,
+        GoogleMap.OnCameraMoveStartedListener {
 
     private View llLocSearchActivity;
     private final String LOG_TAG ="FenceLocator";
@@ -64,6 +66,7 @@ public class LocationSearchActivity extends BaseActivity implements GPSCallback,
     private Button btnSave;
     private SupportMapFragment mapFragment;
     private LatLng currentLatLng = null;
+    private float mZoom = 0.0f;
     private GPSUtills gpsUtills;
     private boolean isGpsEnabled;
     private boolean ispermissionGranted = false;
@@ -171,7 +174,7 @@ public class LocationSearchActivity extends BaseActivity implements GPSCallback,
                             String locationName = edtLocationName.getText().toString();
 
                             Uri CONTENT_URI = Uri.parse(GCCPConstants.CONTENT + GCCPConstants.CONTENT_AUTHORITY + GCCPConstants.DELIMITER +
-                                    GCCPConstants.PREFERRED_LOCATION_TABLE_NAME + GCCPConstants.DELIMITER);
+                                    GCCPConstants.SAVED_LOCATION_TABLE_NAME + GCCPConstants.DELIMITER);
                             Cursor cursor = getContentResolver().query(CONTENT_URI,
                                     new String[]{"MAX(" + PrefLocationDO.LOCATIONID + ") AS " + PrefLocationDO.MAXLOCATIONID},
                                     null,
@@ -264,7 +267,10 @@ public class LocationSearchActivity extends BaseActivity implements GPSCallback,
                 {
                     gpsUtills.getCurrentLatLng();
                     showCurrentLocation();
-                    mMap.setOnCameraChangeListener(LocationSearchActivity.this);
+//                    mMap.setOnCameraChangeListener(LocationSearchActivity.this);
+//                    mMap.setOnCameraMoveListener(LocationSearchActivity.this);
+                    mMap.setOnCameraMoveStartedListener(LocationSearchActivity.this);
+                    mMap.setOnCameraIdleListener(LocationSearchActivity.this);
                 }
             }, 1000);
         }
@@ -343,7 +349,8 @@ public class LocationSearchActivity extends BaseActivity implements GPSCallback,
                 markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE));
                 markerOptions.title("Your Location");
                 mMap.addMarker(markerOptions);*/
-                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng,18.0f));
+                mZoom = 18.0f;
+                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng,mZoom));
 
                 getSupportLoaderManager().initLoader(ApplicationInstance.LOADER_FETCH_ADDRESS, null, this).forceLoad();
             }
@@ -380,11 +387,37 @@ public class LocationSearchActivity extends BaseActivity implements GPSCallback,
         super.onStop();
     }
 
-    @Override
-    public void onCameraChange(CameraPosition cameraPosition) {
+//    @Override
+//    public void onCameraChange(CameraPosition cameraPosition) {
+//
+//        currentLatLng = cameraPosition.target;
+//        gpsUtills.isDeviceConfiguredProperly();
+//    }
 
-        currentLatLng = cameraPosition.target;
+//    @Override
+//    public void onCameraMove() {
+//    }
+
+    @Override
+    public void onCameraMoveStarted(int i) {
+//        mDragTimer.start();
+//        mTimerIsRunning = true;
+    }
+
+    @Override
+    public void onCameraIdle() {
+        // Cleaning all the markers.
+        if (mMap != null) {
+            mMap.clear();
+        }
+
+        currentLatLng = mMap.getCameraPosition().target;
+        mZoom = mMap.getCameraPosition().zoom;
         gpsUtills.isDeviceConfiguredProperly();
+
+//        if (mTimerIsRunning) {
+//            mDragTimer.cancel();
+//        }
     }
 
     @Override

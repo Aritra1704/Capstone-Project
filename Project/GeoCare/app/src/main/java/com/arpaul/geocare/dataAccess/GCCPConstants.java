@@ -12,9 +12,11 @@ public class GCCPConstants {
 
     public static final String DATABASE_NAME                    = "GeoCare.sqlite";
 
-    public static final String PREFERRED_LOCATION_TABLE_NAME    = "tblTagLocation";
+    public static final String SAVED_LOCATION_TABLE_NAME        = "tblTagLocation";
+    public static final String GEOFENCE_LOCATION_TABLE_NAME     = "tblGeoFenceLocation";
 
-    public static final String AKA_PREFERRED_LOCATION_TABLE    = " tPL";
+    public static final String AS_SAVED_LOCATION_TABLE          = " tSL";
+    public static final String AS_GEOFENCE_LOCATION_TABLE       = " tGL";
 
     public static final int DATABASE_VERSION                   = 1;
 
@@ -43,7 +45,7 @@ public class GCCPConstants {
     public static final String CONTENT = "content://";
     public static final Uri BASE_CONTENT_URI = Uri.parse(CONTENT + CONTENT_AUTHORITY);
 
-    public static final Uri CONTENT_URI_PREF_LOC = Uri.parse(CONTENT + CONTENT_AUTHORITY + DELIMITER + PREFERRED_LOCATION_TABLE_NAME);
+    public static final Uri CONTENT_URI_PREF_LOC = Uri.parse(CONTENT + CONTENT_AUTHORITY + DELIMITER + SAVED_LOCATION_TABLE_NAME);
 
     public static final Uri CONTENT_URI_RELATIONSHIP_JOIN = Uri.parse(CONTENT + CONTENT_AUTHORITY + DELIMITER + PATH_RELATIONSHIP_JOIN);
 

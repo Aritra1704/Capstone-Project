@@ -19,7 +19,7 @@
             android:layout_height="wrap_content"
             android:text="Tour"
             android:textColor="@color/color_Black"
-            android:textSize="@dimen/textsize_22"/>
+            android:textSize="@dimen/textsize_18"/>
 
     </LinearLayout>
 
@@ -30,5 +30,5 @@
         android:text="Tour desc"
         android:paddingLeft="@dimen/margin_5"
         android:textColor="@color/color_Black"
-        android:textSize="@dimen/textsize_15"/>
+        android:textSize="@dimen/textsize_12"/>
 </LinearLayout>
