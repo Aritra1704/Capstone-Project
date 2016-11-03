@@ -1,6 +1,5 @@
 package com.arpaul.geocare.geoFence;
 
-import android.Manifest;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
@@ -9,20 +8,13 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.app.LoaderManager;
-import android.support.v4.content.CursorLoader;
-import android.support.v4.content.Loader;
 import android.widget.Toast;
 
 import com.arpaul.geocare.R;
 import com.arpaul.geocare.common.AppConstant;
-import com.arpaul.geocare.common.ApplicationInstance;
 import com.arpaul.geocare.dataAccess.GCCPConstants;
 import com.arpaul.geocare.dataObject.PrefLocationDO;
-import com.arpaul.geocare.geoFence.GeofenceErrorMessages;
-import com.arpaul.geocare.geoFence.GeofenceTransitionsIntentService;
 import com.arpaul.utilitieslib.LogUtils;
-import com.arpaul.utilitieslib.PermissionUtils;
 import com.arpaul.utilitieslib.StringUtils;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -81,7 +73,7 @@ public class GeoFenceNotiService extends Service implements GoogleApiClient.Conn
     @Override
     public void onConnected(@Nullable Bundle bundle) {
 
-        Cursor cursor = getContentResolver().query(GCCPConstants.CONTENT_URI_PREF_LOC,
+        Cursor cursor = getContentResolver().query(GCCPConstants.CONTENT_URI_SAVED_LOC,
                 new String[]{PrefLocationDO.LOCATIONID, PrefLocationDO.LOCATIONNAME, PrefLocationDO.ADDRESS,
                         PrefLocationDO.LATITUDE, PrefLocationDO.LONGITUDE},
                 null,

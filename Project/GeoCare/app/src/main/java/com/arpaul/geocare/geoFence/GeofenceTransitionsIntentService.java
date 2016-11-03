@@ -6,8 +6,11 @@ import android.app.PendingIntent;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.location.Location;
+import android.net.Uri;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 import android.text.TextUtils;
@@ -15,16 +18,16 @@ import android.util.Log;
 
 import com.arpaul.geocare.GeoFenceActivity;
 import com.arpaul.geocare.R;
+import com.arpaul.geocare.dataAccess.GCCPConstants;
 import com.arpaul.geocare.dataObject.GeoFenceLocationDO;
 import com.arpaul.geocare.dataObject.PrefLocationDO;
 import com.arpaul.utilitieslib.CalendarUtils;
+import com.arpaul.utilitieslib.StringUtils;
 import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.GeofencingEvent;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static com.google.android.gms.plus.PlusOneDummyView.TAG;
 
 /**
  * Created by ARPaul on 30-10-2016.
@@ -33,6 +36,7 @@ import static com.google.android.gms.plus.PlusOneDummyView.TAG;
 public class GeofenceTransitionsIntentService extends IntentService {
 
     protected static final  String TAG = "GeofenceIntentService";
+    private Location position;
     public GeofenceTransitionsIntentService(){
         super(TAG);
     }
@@ -57,7 +61,7 @@ public class GeofenceTransitionsIntentService extends IntentService {
             // Get the geofences that were triggered. A single event can trigger
             // multiple geofences.
             List triggeringGeofences = geofencingEvent.getTriggeringGeofences();
-
+            position = geofencingEvent.getTriggeringLocation();
             // Get the transition details as a String.
             String geofenceTransitionDetails = getGeofenceTransitionDetails(
                     this,
@@ -86,15 +90,7 @@ public class GeofenceTransitionsIntentService extends IntentService {
         }
         String triggeringGeofencesIdsString = TextUtils.join(", ", triggeringGeofencesIdsList);
 
-//        ContentValues cValues = new ContentValues();
-//        cValues.put(GeoFenceLocationDO.LOCATIONID, objPrefLocationDO.LocationId);
-//        cValues.put(GeoFenceLocationDO.LOCATIONNAME, triggeringGeofencesIdsString);
-//        cValues.put(GeoFenceLocationDO.ADDRESS, objPrefLocationDO.Address);
-//        cValues.put(GeoFenceLocationDO.LATITUDE, objPrefLocationDO.Latitude);
-//        cValues.put(GeoFenceLocationDO.LONGITUDE, objPrefLocationDO.Longitude);
-//        cValues.put(GeoFenceLocationDO.EVENT, objPrefLocationDO.Latitude);
-//        cValues.put(GeoFenceLocationDO.OCCURANCETIME, CalendarUtils.getDateinPattern(CalendarUtils.DATE_TIME_FORMAT_T));
-
+        trackPositions(geofenceTransitionString + ": " + triggeringGeofencesIdsString);
         return geofenceTransitionString + ": " + triggeringGeofencesIdsString;
     }
 
@@ -108,6 +104,37 @@ public class GeofenceTransitionsIntentService extends IntentService {
                 return getString(R.string.geofence_currently_in);
             default:
                 return getString(R.string.unknown_geofence_transition);
+        }
+    }
+
+    private void trackPositions(String triggeringGeofences) {
+        String[] geofenceEvent = triggeringGeofences.split(":");
+        if(geofenceEvent != null && geofenceEvent.length > 0) {
+
+            Cursor cursor = getContentResolver().query(GCCPConstants.CONTENT_URI_SAVED_LOC,
+                    new String[]{PrefLocationDO.LOCATIONID, PrefLocationDO.ADDRESS},
+                    PrefLocationDO.LOCATIONNAME + GCCPConstants.TABLE_QUES,
+                    new String[]{geofenceEvent[1]},
+                    null);
+            if(cursor != null && cursor.moveToFirst()) {
+                PrefLocationDO objPrefLocationDO = new PrefLocationDO();
+                objPrefLocationDO.LocationId = StringUtils.getInt(cursor.getString(cursor.getColumnIndex(PrefLocationDO.LOCATIONID)));
+                objPrefLocationDO.Address = cursor.getString(cursor.getColumnIndex(PrefLocationDO.ADDRESS));
+
+
+                ContentValues cValues = new ContentValues();
+                cValues.put(GeoFenceLocationDO.LOCATIONID, objPrefLocationDO.LocationId);
+                cValues.put(GeoFenceLocationDO.LOCATIONNAME, geofenceEvent[1]);
+                cValues.put(GeoFenceLocationDO.ADDRESS, objPrefLocationDO.Address);
+                cValues.put(GeoFenceLocationDO.LATITUDE, position.getLatitude());
+                cValues.put(GeoFenceLocationDO.LONGITUDE, position.getLongitude());
+                cValues.put(GeoFenceLocationDO.EVENT, geofenceEvent[0]);
+                cValues.put(GeoFenceLocationDO.OCCURANCEDATE, CalendarUtils.getDateinPattern(CalendarUtils.DATE_FORMAT1));
+                cValues.put(GeoFenceLocationDO.OCCURANCETIME, CalendarUtils.getDateinPattern(CalendarUtils.TIME_SEC_FORMAT));
+
+                Uri uri = getContentResolver().insert(GCCPConstants.CONTENT_URI_GEOFENCE_LOC, cValues);
+                cursor.close();
+            }
         }
     }
 

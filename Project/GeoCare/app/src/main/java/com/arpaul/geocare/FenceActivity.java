@@ -58,6 +58,8 @@ public class FenceActivity extends BaseActivity implements LoaderManager.LoaderC
         });
 
         getSupportLoaderManager().initLoader(ApplicationInstance.LOADER_FETCH_ALL_LOCATION, null, this);
+
+        setTitle("You");
     }
 
     @Override
@@ -97,7 +99,7 @@ public class FenceActivity extends BaseActivity implements LoaderManager.LoaderC
     public Loader onCreateLoader(int id, Bundle args) {
         switch (id){
             case ApplicationInstance.LOADER_FETCH_ALL_LOCATION :
-                return new CursorLoader(this, GCCPConstants.CONTENT_URI_PREF_LOC,
+                return new CursorLoader(this, GCCPConstants.CONTENT_URI_SAVED_LOC,
                         new String[]{PrefLocationDO.LOCATIONID, PrefLocationDO.LOCATIONNAME, PrefLocationDO.ADDRESS,
                                 PrefLocationDO.LATITUDE, PrefLocationDO.LONGITUDE},
                         null,

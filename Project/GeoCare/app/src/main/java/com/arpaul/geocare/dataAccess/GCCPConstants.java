@@ -45,7 +45,8 @@ public class GCCPConstants {
     public static final String CONTENT = "content://";
     public static final Uri BASE_CONTENT_URI = Uri.parse(CONTENT + CONTENT_AUTHORITY);
 
-    public static final Uri CONTENT_URI_PREF_LOC = Uri.parse(CONTENT + CONTENT_AUTHORITY + DELIMITER + SAVED_LOCATION_TABLE_NAME);
+    public static final Uri CONTENT_URI_SAVED_LOC = Uri.parse(CONTENT + CONTENT_AUTHORITY + DELIMITER + SAVED_LOCATION_TABLE_NAME);
+    public static final Uri CONTENT_URI_GEOFENCE_LOC = Uri.parse(CONTENT + CONTENT_AUTHORITY + DELIMITER + GEOFENCE_LOCATION_TABLE_NAME);
 
     public static final Uri CONTENT_URI_RELATIONSHIP_JOIN = Uri.parse(CONTENT + CONTENT_AUTHORITY + DELIMITER + PATH_RELATIONSHIP_JOIN);
 
@@ -74,6 +75,6 @@ public class GCCPConstants {
             ContentResolver.CURSOR_ITEM_BASE_TYPE + DELIMITER + CONTENT_AUTHORITY + DELIMITER + DATABASE_NAME;
 
     public static Uri buildLocationUri(long id){
-        return ContentUris.withAppendedId(CONTENT_URI_PREF_LOC, id);
+        return ContentUris.withAppendedId(CONTENT_URI_SAVED_LOC, id);
     }
 }

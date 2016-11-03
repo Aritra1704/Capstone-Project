@@ -14,7 +14,6 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
-import android.text.TextUtils;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.Toast;
@@ -232,7 +231,7 @@ public class GeoFenceActivity extends BaseActivity implements
     public Loader onCreateLoader(int id, Bundle args) {
         switch (id){
             case ApplicationInstance.LOADER_FETCH_ALL_LOCATION :
-                return new CursorLoader(this, GCCPConstants.CONTENT_URI_PREF_LOC,
+                return new CursorLoader(this, GCCPConstants.CONTENT_URI_SAVED_LOC,
                         new String[]{PrefLocationDO.LOCATIONID, PrefLocationDO.LOCATIONNAME, PrefLocationDO.ADDRESS,
                                 PrefLocationDO.LATITUDE, PrefLocationDO.LONGITUDE},
                         null,

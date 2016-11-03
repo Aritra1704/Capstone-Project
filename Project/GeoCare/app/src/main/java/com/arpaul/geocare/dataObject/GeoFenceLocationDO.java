@@ -9,6 +9,9 @@ public class GeoFenceLocationDO extends BaseDO {
     public String Address               = "";
     public double Latitude              = 0.0;
     public double Longitude             = 0.0;
+    public String Event                 = "";
+    public String OccuranceDate         = "";
+    public String OccuranceTime         = "";
 
     public static final String LOCATIONID       = "LOCATIONID";
     public static final String LOCATIONNAME     = "LOCATIONNAME";
@@ -16,5 +19,6 @@ public class GeoFenceLocationDO extends BaseDO {
     public static final String LATITUDE         = "LATITUDE";
     public static final String LONGITUDE        = "LONGITUDE";
     public static final String EVENT            = "EVENT";
+    public static final String OCCURANCEDATE    = "OCCURANCEDATE";
     public static final String OCCURANCETIME    = "OCCURANCETIME";
 }

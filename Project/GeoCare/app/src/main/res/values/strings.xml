@@ -132,4 +132,6 @@
     <string name="pref_title_vibrate">Vibrate</string>
     <!--API_KEY-->
     <string name="server_client_id">143027165557-8o8q97oqa8ocufkmit8d6el2e5cd7c38.apps.googleusercontent.com</string>
+    <string name="title_activity_tabbed">TabbedActivity</string>
+    <string name="section_format">Hello World from section: %1$d</string>
 </resources>
