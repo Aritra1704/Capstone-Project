@@ -22,4 +22,10 @@
         <item name="android:textColor">@android:color/white</item>
     </style>
 
+    <style name="PagerTitleStrip">
+        <item name="android:textColor">#FFFFFFFF</item>
+        <item name="android:textSize">@dimen/textsize_18</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
 </resources>

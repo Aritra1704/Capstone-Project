@@ -43,6 +43,7 @@ public class ContentProviderHelper extends ContentProvider {
         uriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
         uriMatcher.addURI(GCCPConstants.PROVIDER_NAME, GCCPConstants.SAVED_LOCATION_TABLE_NAME, PREF_LOC_NAME);
         uriMatcher.addURI(GCCPConstants.PROVIDER_NAME, GCCPConstants.PATH_RELATIONSHIP_JOIN, RELATIONSHIP_JOIN);
+        uriMatcher.addURI(GCCPConstants.PROVIDER_NAME, GCCPConstants.GEOFENCE_LOCATION_TABLE_NAME, GEOFENCE_LOC);
     }
 
     private DataBaseHelper mOpenHelper;
