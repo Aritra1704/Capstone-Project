@@ -18,6 +18,7 @@ import android.util.Log;
 
 import com.arpaul.geocare.GeoFenceActivity;
 import com.arpaul.geocare.R;
+import com.arpaul.geocare.common.AppConstant;
 import com.arpaul.geocare.dataAccess.GCCPConstants;
 import com.arpaul.geocare.dataObject.GeoFenceLocationDO;
 import com.arpaul.geocare.dataObject.PrefLocationDO;
@@ -109,6 +110,9 @@ public class GeofenceTransitionsIntentService extends IntentService {
 
     private void trackPositions(String triggeringGeofences) {
         String[] geofenceEvent = triggeringGeofences.split(":");
+
+        AppConstant.writeFile(geofenceEvent.toString() + " Date: " + CalendarUtils.getDateinPattern(CalendarUtils.DATE_TIME_FORMAT_T));
+
         if(geofenceEvent != null && geofenceEvent.length > 0) {
 
             Cursor cursor = getContentResolver().query(GCCPConstants.CONTENT_URI_SAVED_LOC,
