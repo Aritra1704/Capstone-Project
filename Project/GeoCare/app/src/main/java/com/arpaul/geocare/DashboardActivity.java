@@ -54,7 +54,7 @@ public class DashboardActivity extends BaseActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_tabbed, menu);
+        getMenuInflater().inflate(R.menu.menu_base, menu);
         return true;
     }
 
@@ -67,7 +67,7 @@ public class DashboardActivity extends BaseActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
-            startActivity(new Intent(this, SettingsActivity.class));
+            startActivity(new Intent(this, /*SettingsActivity*/GeocareSettingsActivity.class));
             return true;
         } else if (id == R.id.action_signin) {
             startActivity(new Intent(this, SignInActivity.class));

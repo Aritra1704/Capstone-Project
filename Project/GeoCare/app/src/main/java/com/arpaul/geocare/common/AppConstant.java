@@ -24,5 +24,6 @@ public class AppConstant {
     public static final long LOCATION_UPDATES_IN_SECONDS = 60;
 
     public static final String ACTION_REFRESH      = "ACTION_REFRESH";
+    public static final String EXTERNAL_FOLDER     = "/GeoCare/";
     public static FirebaseAuth mFirebaseAuth;;
 }

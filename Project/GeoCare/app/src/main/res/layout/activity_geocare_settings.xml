@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clickable="true"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tvUploadDb"
+            android:layout_width="match_parent"
+            android:drawablePadding="@dimen/margin_5"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/margin_5"
+            android:drawableLeft="@drawable/ic_sync_black_24dp"
+            android:padding="@dimen/margin_5"
+            android:text="@string/upload_db"
+            android:textSize="@dimen/textsize_16"/>
+    </LinearLayout>
+</ScrollView>
