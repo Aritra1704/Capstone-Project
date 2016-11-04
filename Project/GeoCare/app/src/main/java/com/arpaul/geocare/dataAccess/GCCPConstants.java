@@ -39,6 +39,7 @@ public class GCCPConstants {
     public static final String TABLE_NOT_IN = " NOT IN ";
     public static final String TABLE_DISTINCT = " DISTINCT ";
     public static final String TABLE_QUES  = " = ? ";
+    public static final String TABLE_LIKE  = " LIKE ? ";
     public static final String TABLE_NOT_QUES  = " != ? ";
     public static final String TABLE_IN_BRACKET  = " ( ? ) ";
 

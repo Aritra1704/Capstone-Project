@@ -91,7 +91,7 @@ public class GeofenceTransitionsIntentService extends IntentService {
         }
         String triggeringGeofencesIdsString = TextUtils.join(", ", triggeringGeofencesIdsList);
 
-        trackPositions(geofenceTransitionString + ": " + triggeringGeofencesIdsString);
+        trackPositions(geofenceTransitionString + "]" + triggeringGeofencesIdsString);
         return geofenceTransitionString + ": " + triggeringGeofencesIdsString;
     }
 
@@ -109,22 +109,23 @@ public class GeofenceTransitionsIntentService extends IntentService {
     }
 
     private void trackPositions(String triggeringGeofences) {
-        String[] geofenceEvent = triggeringGeofences.split(":");
+        String[] geofenceEvent = triggeringGeofences.split("]");
 
-        AppConstant.writeFile(geofenceEvent.toString() + " Date: " + CalendarUtils.getDateinPattern(CalendarUtils.DATE_TIME_FORMAT_T));
+        AppConstant.writeFile("\n" + triggeringGeofences + " Date: " + CalendarUtils.getDateinPattern(CalendarUtils.DATE_TIME_FORMAT_T));
 
         if(geofenceEvent != null && geofenceEvent.length > 0) {
 
             Cursor cursor = getContentResolver().query(GCCPConstants.CONTENT_URI_SAVED_LOC,
                     new String[]{PrefLocationDO.LOCATIONID, PrefLocationDO.ADDRESS},
-                    PrefLocationDO.LOCATIONNAME + GCCPConstants.TABLE_QUES,
-                    new String[]{geofenceEvent[1]},
+                    PrefLocationDO.LOCATIONNAME + GCCPConstants.TABLE_LIKE,
+                    new String[]{geofenceEvent[1].trim()},
                     null);
             if(cursor != null && cursor.moveToFirst()) {
                 PrefLocationDO objPrefLocationDO = new PrefLocationDO();
                 objPrefLocationDO.LocationId = StringUtils.getInt(cursor.getString(cursor.getColumnIndex(PrefLocationDO.LOCATIONID)));
                 objPrefLocationDO.Address = cursor.getString(cursor.getColumnIndex(PrefLocationDO.ADDRESS));
 
+                AppConstant.writeFile("\n" + objPrefLocationDO.Address);
 
                 ContentValues cValues = new ContentValues();
                 cValues.put(GeoFenceLocationDO.LOCATIONID, objPrefLocationDO.LocationId);

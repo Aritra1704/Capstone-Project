@@ -12,6 +12,7 @@ import com.arpaul.geocare.BaseActivity;
 import com.arpaul.geocare.R;
 import com.arpaul.geocare.dataObject.GeoFenceLocationDO;
 import com.arpaul.geocare.dataObject.PrefLocationDO;
+import com.arpaul.utilitieslib.CalendarUtils;
 
 import java.util.ArrayList;
 
@@ -44,7 +45,11 @@ public class TrackLocationsAdapter extends RecyclerView.Adapter<TrackLocationsAd
         final GeoFenceLocationDO objTourDO = arrTours.get(position);
 
         holder.tvTourName.setText(objTourDO.LocationName);
-        holder.tvTourDesc.setText(objTourDO.Address);
+
+        String descrip = objTourDO.Event + " at " +
+                CalendarUtils.getDateinPattern(objTourDO.OccuranceDate, CalendarUtils.DATE_FORMAT1, CalendarUtils.DATE_FORMAT_WITH_COMMA) + " " +
+                CalendarUtils.getDateinPattern(objTourDO.OccuranceTime, CalendarUtils.TIME_SEC_FORMAT, CalendarUtils.TIME_HOUR_MINUTE);
+        holder.tvTourDesc.setText(descrip);
 
         ((BaseActivity)context).applyTypeface(((BaseActivity)context).getParentView(holder.mView),((BaseActivity)context).tfRegular, Typeface.NORMAL);
     }

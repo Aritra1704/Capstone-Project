@@ -85,8 +85,8 @@ public class TrackPathFragment extends Fragment implements LoaderManager.LoaderC
         switch (id){
             case ApplicationInstance.LOADER_FETCH_TRACK_LOCATION :
                 return new CursorLoader(getActivity(), GCCPConstants.CONTENT_URI_GEOFENCE_LOC,
-                        new String[]{GeoFenceLocationDO.LOCATIONID, GeoFenceLocationDO.LOCATIONNAME, GeoFenceLocationDO.ADDRESS,
-                                GeoFenceLocationDO.LATITUDE, GeoFenceLocationDO.LONGITUDE},
+                        new String[]{GeoFenceLocationDO.LOCATIONID, GeoFenceLocationDO.LOCATIONNAME, GeoFenceLocationDO.EVENT,
+                                GeoFenceLocationDO.OCCURANCEDATE, GeoFenceLocationDO.OCCURANCETIME},
                         null,
                         null,
                         null);
@@ -108,9 +108,9 @@ public class TrackPathFragment extends Fragment implements LoaderManager.LoaderC
                             objGeoFenceLocationDO = new GeoFenceLocationDO();
                             objGeoFenceLocationDO.LocationId = StringUtils.getInt(cursor.getString(cursor.getColumnIndex(GeoFenceLocationDO.LOCATIONID)));
                             objGeoFenceLocationDO.LocationName = cursor.getString(cursor.getColumnIndex(GeoFenceLocationDO.LOCATIONNAME));
-                            objGeoFenceLocationDO.Address = cursor.getString(cursor.getColumnIndex(GeoFenceLocationDO.ADDRESS));
-                            objGeoFenceLocationDO.Latitude = StringUtils.getDouble(cursor.getString(cursor.getColumnIndex(GeoFenceLocationDO.LATITUDE)));
-                            objGeoFenceLocationDO.Longitude = StringUtils.getDouble(cursor.getString(cursor.getColumnIndex(GeoFenceLocationDO.LONGITUDE)));
+                            objGeoFenceLocationDO.Event = cursor.getString(cursor.getColumnIndex(GeoFenceLocationDO.EVENT));
+                            objGeoFenceLocationDO.OccuranceDate = cursor.getString(cursor.getColumnIndex(GeoFenceLocationDO.OCCURANCEDATE));
+                            objGeoFenceLocationDO.OccuranceTime = cursor.getString(cursor.getColumnIndex(GeoFenceLocationDO.OCCURANCETIME));
 
                             arrGeoFenceLocationDO.add(objGeoFenceLocationDO);
                         } while (cursor.moveToNext());

@@ -1,9 +1,14 @@
 package com.arpaul.geocare;
 
+import android.*;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.graphics.Typeface;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
@@ -24,11 +29,21 @@ import com.android.internal.util.Predicate;
 import com.arpaul.customalertlibrary.dialogs.CustomDialog;
 import com.arpaul.customalertlibrary.popups.statingDialog.CustomPopupType;
 import com.arpaul.customalertlibrary.popups.statingDialog.PopupListener;
+import com.arpaul.geocare.common.AppConstant;
 import com.arpaul.geocare.common.AppPreference;
+import com.arpaul.geocare.dataAccess.GCCPConstants;
+import com.arpaul.geocare.geoFence.GeoFenceNotiService;
+import com.arpaul.utilitieslib.FileUtils;
+import com.arpaul.utilitieslib.LogUtils;
+import com.arpaul.utilitieslib.PermissionUtils;
 import com.arpaul.utilitieslib.UnCaughtException;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 
 public abstract class BaseActivity extends AppCompatActivity implements PopupListener {
 
@@ -63,6 +78,28 @@ public abstract class BaseActivity extends AppCompatActivity implements PopupLis
 //                        .setAction("Action", null).show();
 //            }
 //        });
+
+        //Remove later
+        startService(new Intent(BaseActivity.this, GeoFenceNotiService.class));
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        try {
+            if (Build.VERSION.SDK_INT >= 21) {
+                if(new PermissionUtils().checkPermission(BaseActivity.this, new String[]{
+                        android.Manifest.permission.READ_EXTERNAL_STORAGE,
+                        android.Manifest.permission.WRITE_EXTERNAL_STORAGE}) != 0){
+                    new PermissionUtils().verifyLocation(BaseActivity.this,new String[]{
+                            android.Manifest.permission.READ_EXTERNAL_STORAGE,
+                            android.Manifest.permission.WRITE_EXTERNAL_STORAGE});
+                }
+            }
+        } catch (Exception ex){
+            ex.printStackTrace();
+        }
     }
 
     @Override
@@ -102,6 +139,67 @@ public abstract class BaseActivity extends AppCompatActivity implements PopupLis
                 showCustomDialog(getString(R.string.gpssettings),getString(R.string.gps_not_enabled),getString(R.string.settings),getString(R.string.cancel),getString(R.string.settings), CustomPopupType.DIALOG_ALERT,false);
             }
         });
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        int copyFile = 0;
+        if (requestCode == 1) {
+            for(int i = 0; i < permissions.length; i++){
+                if(permissions[i].equalsIgnoreCase(android.Manifest.permission.READ_EXTERNAL_STORAGE) && grantResults[i] == 1)
+                    copyFile++;
+                else if(permissions[i].equalsIgnoreCase(android.Manifest.permission.WRITE_EXTERNAL_STORAGE) && grantResults[i] == 1)
+                    copyFile++;
+            }
+
+            if(copyFile == 2)
+                copyFile();
+        }
+    }
+
+    public void copyAppDbtoSdcard(){
+        try {
+            if (Build.VERSION.SDK_INT >= 21) {
+                if(new PermissionUtils().checkPermission(BaseActivity.this, new String[]{
+                        android.Manifest.permission.READ_EXTERNAL_STORAGE,
+                        android.Manifest.permission.WRITE_EXTERNAL_STORAGE}) != 0){
+                    new PermissionUtils().verifyLocation(BaseActivity.this,new String[]{
+                            android.Manifest.permission.READ_EXTERNAL_STORAGE,
+                            android.Manifest.permission.WRITE_EXTERNAL_STORAGE});
+                } else
+                    copyFile();
+            } else
+                copyFile();
+
+        } catch (Exception ex){
+            ex.printStackTrace();
+        }
+    }
+
+    private void copyFile(){
+        try {
+            PackageManager manager = this.getPackageManager();
+            PackageInfo info = manager.getPackageInfo(this.getPackageName(), 0);
+
+            File Db = new File("/data/data/" + info.packageName + "/databases/" + GCCPConstants.DATABASE_NAME);
+            Date d = new Date();
+
+            String path = Environment.getExternalStorageDirectory() + AppConstant.EXTERNAL_FOLDER;
+            LogUtils.infoLog("FOLDER_PATH", path);
+            File fileDir = new File(path);
+            if(!fileDir.exists())
+                fileDir.mkdirs();
+
+            File file = new File(Environment.getExternalStorageDirectory() + AppConstant.EXTERNAL_FOLDER + GCCPConstants.DATABASE_NAME);
+            file.createNewFile();
+            file.setWritable(true);
+
+            FileUtils.copyFile(new FileInputStream(Db), new FileOutputStream(file));
+        } catch (Exception ex){
+            ex.printStackTrace();
+        }
     }
 
     /**
