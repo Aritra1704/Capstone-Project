@@ -58,8 +58,6 @@ public class SavedGeoFenceFragment extends Fragment implements LoaderManager.Loa
 
         initialiseFragment(view);
 
-        loadData();
-
         bindControls();
 
         return view;
@@ -83,7 +81,10 @@ public class SavedGeoFenceFragment extends Fragment implements LoaderManager.Loa
     public void onResume() {
         super.onResume();
 
-        getActivity().getSupportLoaderManager().restartLoader(ApplicationInstance.LOADER_FETCH_ALL_LOCATION,null, this);
+        if(getActivity().getSupportLoaderManager().getLoader(ApplicationInstance.LOADER_FETCH_ALL_LOCATION) != null)
+            getActivity().getSupportLoaderManager().restartLoader(ApplicationInstance.LOADER_FETCH_ALL_LOCATION, null, this);
+        else
+            loadData();
     }
 
     @Override

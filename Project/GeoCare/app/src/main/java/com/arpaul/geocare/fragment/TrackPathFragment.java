@@ -17,11 +17,10 @@ import android.widget.TextView;
 
 import com.arpaul.geocare.GeoFenceActivity;
 import com.arpaul.geocare.R;
-import com.arpaul.geocare.adapter.GeoLocationsAdapter;
+import com.arpaul.geocare.adapter.TrackLocationsAdapter;
 import com.arpaul.geocare.common.ApplicationInstance;
 import com.arpaul.geocare.dataAccess.GCCPConstants;
 import com.arpaul.geocare.dataObject.GeoFenceLocationDO;
-import com.arpaul.geocare.dataObject.PrefLocationDO;
 import com.arpaul.utilitieslib.StringUtils;
 
 import java.util.ArrayList;
@@ -36,8 +35,8 @@ public class TrackPathFragment extends Fragment implements LoaderManager.LoaderC
     private RecyclerView rvGeoLocations;
     private FloatingActionButton fabGeoFence;
 
-    private ArrayList<PrefLocationDO> arrPrefLocationDO = new ArrayList<>();
-    private GeoLocationsAdapter adapter;
+    private ArrayList<GeoFenceLocationDO> arrGeoFenceLocationDO = new ArrayList<>();
+    private TrackLocationsAdapter adapter;
 
     public static TrackPathFragment newInstance() {
         TrackPathFragment fragment = new TrackPathFragment();
@@ -52,15 +51,13 @@ public class TrackPathFragment extends Fragment implements LoaderManager.LoaderC
 
         initialiseFragment(view);
 
-        loadData();
-
         bindControls();
 
         return view;
     }
 
     private void loadData(){
-        getActivity().getSupportLoaderManager().initLoader(ApplicationInstance.LOADER_FETCH_ALL_LOCATION, null, this);
+        getActivity().getSupportLoaderManager().initLoader(ApplicationInstance.LOADER_FETCH_TRACK_LOCATION, null, this);
     }
 
     private void bindControls(){
@@ -76,13 +73,17 @@ public class TrackPathFragment extends Fragment implements LoaderManager.LoaderC
     public void onResume() {
         super.onResume();
 
-        getActivity().getSupportLoaderManager().restartLoader(ApplicationInstance.LOADER_FETCH_ALL_LOCATION,null, this);
+        if(getActivity().getSupportLoaderManager().getLoader(ApplicationInstance.LOADER_FETCH_TRACK_LOCATION) != null)
+            getActivity().getSupportLoaderManager().restartLoader(ApplicationInstance.LOADER_FETCH_TRACK_LOCATION, null, this);
+        else
+            loadData();
+
     }
 
     @Override
     public Loader onCreateLoader(int id, Bundle args) {
         switch (id){
-            case ApplicationInstance.LOADER_FETCH_ALL_LOCATION :
+            case ApplicationInstance.LOADER_FETCH_TRACK_LOCATION :
                 return new CursorLoader(getActivity(), GCCPConstants.CONTENT_URI_GEOFENCE_LOC,
                         new String[]{GeoFenceLocationDO.LOCATIONID, GeoFenceLocationDO.LOCATIONNAME, GeoFenceLocationDO.ADDRESS,
                                 GeoFenceLocationDO.LATITUDE, GeoFenceLocationDO.LONGITUDE},
@@ -97,33 +98,32 @@ public class TrackPathFragment extends Fragment implements LoaderManager.LoaderC
     @Override
     public void onLoadFinished(Loader loader, Object data) {
         switch (loader.getId()){
-            case ApplicationInstance.LOADER_FETCH_ALL_LOCATION :
+            case ApplicationInstance.LOADER_FETCH_TRACK_LOCATION :
                 if(data instanceof Cursor) {
                     Cursor cursor = (Cursor) data;
                     if(cursor != null && cursor.moveToFirst()){
-                        PrefLocationDO objPrefLocationDO = null;
-                        arrPrefLocationDO.clear();
+                        GeoFenceLocationDO objGeoFenceLocationDO = null;
+                        arrGeoFenceLocationDO.clear();
                         do {
-                            objPrefLocationDO = new PrefLocationDO();
-                            objPrefLocationDO.LocationId = StringUtils.getInt(cursor.getString(cursor.getColumnIndex(GeoFenceLocationDO.LOCATIONID)));
-                            objPrefLocationDO.LocationName = cursor.getString(cursor.getColumnIndex(GeoFenceLocationDO.LOCATIONNAME));
-                            objPrefLocationDO.Address = cursor.getString(cursor.getColumnIndex(GeoFenceLocationDO.ADDRESS));
-                            objPrefLocationDO.Latitude = StringUtils.getDouble(cursor.getString(cursor.getColumnIndex(GeoFenceLocationDO.LATITUDE)));
-                            objPrefLocationDO.Longitude = StringUtils.getDouble(cursor.getString(cursor.getColumnIndex(GeoFenceLocationDO.LONGITUDE)));
+                            objGeoFenceLocationDO = new GeoFenceLocationDO();
+                            objGeoFenceLocationDO.LocationId = StringUtils.getInt(cursor.getString(cursor.getColumnIndex(GeoFenceLocationDO.LOCATIONID)));
+                            objGeoFenceLocationDO.LocationName = cursor.getString(cursor.getColumnIndex(GeoFenceLocationDO.LOCATIONNAME));
+                            objGeoFenceLocationDO.Address = cursor.getString(cursor.getColumnIndex(GeoFenceLocationDO.ADDRESS));
+                            objGeoFenceLocationDO.Latitude = StringUtils.getDouble(cursor.getString(cursor.getColumnIndex(GeoFenceLocationDO.LATITUDE)));
+                            objGeoFenceLocationDO.Longitude = StringUtils.getDouble(cursor.getString(cursor.getColumnIndex(GeoFenceLocationDO.LONGITUDE)));
 
-                            arrPrefLocationDO.add(objPrefLocationDO);
+                            arrGeoFenceLocationDO.add(objGeoFenceLocationDO);
                         } while (cursor.moveToNext());
 
-                        if(arrPrefLocationDO != null && arrPrefLocationDO.size() > 0){
+                        if(arrGeoFenceLocationDO != null && arrGeoFenceLocationDO.size() > 0){
                             tvNoLocations.setVisibility(View.GONE);
                             rvGeoLocations.setVisibility(View.VISIBLE);
 
-                            adapter.refresh(arrPrefLocationDO);
+                            adapter.refresh(arrGeoFenceLocationDO);
                         } else {
                             tvNoLocations.setVisibility(View.VISIBLE);
                             rvGeoLocations.setVisibility(View.GONE);
                         }
-
                     }
                 }
                 break;
@@ -140,7 +140,7 @@ public class TrackPathFragment extends Fragment implements LoaderManager.LoaderC
         tvNoLocations = (TextView) view.findViewById(R.id.tvNoLocations);
         rvGeoLocations = (RecyclerView) view.findViewById(R.id.rvGeoLocations);
 
-        adapter = new GeoLocationsAdapter(getActivity(), new ArrayList<PrefLocationDO>());
+        adapter = new TrackLocationsAdapter(getActivity(), new ArrayList<GeoFenceLocationDO>());
         rvGeoLocations.setAdapter(adapter);
     }
 }
