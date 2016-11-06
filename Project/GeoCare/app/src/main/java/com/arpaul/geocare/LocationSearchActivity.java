@@ -502,5 +502,7 @@ public class LocationSearchActivity extends BaseActivity implements GPSCallback,
         ivCross             = (ImageView) llLocSearchActivity.findViewById(R.id.ivCross);
         edtAddress          = (EditText) llLocSearchActivity.findViewById(R.id.edtAddress);
         btnSave             = (Button) llLocSearchActivity.findViewById(R.id.btnSave);
+
+        toolbarBase.setVisibility(View.GONE);
     }
 }

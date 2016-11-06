@@ -176,11 +176,10 @@ public class GeoFenceActivity extends BaseActivity implements
     @Override
     public void onLocationChanged(Location location) {
         LogUtils.infoLog(LOG_TAG, location.toString());
-        //txtOutput.setText(location.toString());
 
         currentLatLng = new LatLng(location.getLatitude(), location.getLongitude());
 
-//        Toast.makeText(GeoFenceActivity.this, "Lat: "+currentLatLng.latitude+" Lon: "+currentLatLng.longitude, Toast.LENGTH_SHORT).show();
+        Toast.makeText(GeoFenceActivity.this, "Lat: "+currentLatLng.latitude+" Lon: "+currentLatLng.longitude, Toast.LENGTH_SHORT).show();
         showLocations();
     }
 
@@ -375,5 +374,7 @@ public class GeoFenceActivity extends BaseActivity implements
     private void initialiseControls(){
         mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
+        toolbarBase.setVisibility(View.GONE);
     }
 }

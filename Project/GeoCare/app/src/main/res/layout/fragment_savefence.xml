@@ -16,7 +16,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_margin="@dimen/fab_margin"
-        android:src="@drawable/svg_search_locs"
-        android:tint="@color/colorWhite"/>
+        app:srcCompat="@drawable/svg_search_locs"
+        app:backgroundTint="@color/colorWhite"/>
 
 </FrameLayout>

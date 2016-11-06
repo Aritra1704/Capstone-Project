@@ -15,7 +15,7 @@ android {
     }
     buildTypes {
         debug {
-            minifyEnabled false
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
         release {
@@ -32,17 +32,22 @@ dependencies {
     })
     compile 'com.android.support:appcompat-v7:24.2.1'
     compile 'com.android.support:design:24.2.1'
+    compile 'com.android.support:multidex:1.0.0'
+    compile 'com.android.support:support-v4:24.2.1'
+    compile 'com.android.support:support-vector-drawable:24.2.1'
+
     compile 'com.github.Aritra1704:UtilitiesJitPackLib:1.12'
     compile 'com.github.Aritra1704:CustomAlerts:1.03'
     compile 'com.github.Aritra1704:LocationFinder:1.2'
     compile 'com.afollestad.material-dialogs:core:0.8.5.9'
+
 //    compile 'com.google.android.gms:play-services:9.8.0'
     compile 'com.google.android.gms:play-services-maps:9.8.0'
     compile 'com.google.android.gms:play-services-auth:9.8.0'
+
     compile 'com.google.firebase:firebase-core:9.8.0'
     compile 'com.google.firebase:firebase-messaging:9.8.0'
-    compile 'com.android.support:support-v4:24.2.1'
-    compile 'com.android.support:support-vector-drawable:24.2.1'
+
     testCompile 'junit:junit:4.12'
 }
 

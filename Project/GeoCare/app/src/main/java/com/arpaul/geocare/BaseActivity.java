@@ -49,6 +49,8 @@ public abstract class BaseActivity extends AppCompatActivity implements PopupLis
 
     public LayoutInflater baseInflater;
     public LinearLayout llBody;
+    public Toolbar toolbarBase;
+
     private CustomDialog cDialog;
     public AppPreference preference;
     public Typeface tfRegular,tfBold;
@@ -67,8 +69,6 @@ public abstract class BaseActivity extends AppCompatActivity implements PopupLis
 
         initialize();
 
-//        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-//        setSupportActionBar(toolbar);
 //
 //        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
 //        fab.setOnClickListener(new View.OnClickListener() {
@@ -118,6 +118,10 @@ public abstract class BaseActivity extends AppCompatActivity implements PopupLis
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            startActivity(new Intent(this, GeocareSettingsActivity.class));
+            return true;
+        } else if (id == R.id.action_signin) {
+            startActivity(new Intent(this, SignInActivity.class));
             return true;
         }
 
@@ -129,6 +133,8 @@ public abstract class BaseActivity extends AppCompatActivity implements PopupLis
     private void bindBaseControls(){
         if(preference == null)
             preference = new AppPreference(this);
+
+        setTitle("You");
     }
 
     public void showSettingsAlert()
@@ -380,7 +386,10 @@ public abstract class BaseActivity extends AppCompatActivity implements PopupLis
 
     private void initialiseBaseControls(){
         baseInflater            = 	this.getLayoutInflater();
-        llBody = (LinearLayout) findViewById(R.id.llBody);
+        llBody                  = (LinearLayout) findViewById(R.id.llBody);
+
+        toolbarBase             = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbarBase);
 
         createTypeFace();
     }

@@ -14,9 +14,9 @@
         android:id="@+id/fabGeoFence"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="left|bottom"
+        android:layout_gravity="right|bottom"
         android:layout_margin="@dimen/fab_margin"
-        android:src="@drawable/svg_map_locs"
-        android:tint="@color/colorWhite"/>
+        app:srcCompat="@drawable/svg_map_locs"
+        app:backgroundTint="@color/colorWhite"/>
 
 </FrameLayout>
