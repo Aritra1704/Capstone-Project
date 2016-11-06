@@ -8,65 +8,60 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-
 import com.arpaul.geocare.BaseActivity;
 import com.arpaul.geocare.R;
-import com.arpaul.geocare.dataObject.PrefLocationDO;
 
 import java.util.ArrayList;
 
 /**
  * Created by Aritra on 23-06-2016.
  */
-public class GeoLocationsAdapter extends RecyclerView.Adapter<GeoLocationsAdapter.ViewHolder> {
+public class TrackLocationTimeAdapter extends RecyclerView.Adapter<TrackLocationTimeAdapter.ViewHolder> {
 
     private Context context;
-    private ArrayList<PrefLocationDO> arrPrefLocationDO = new ArrayList<>();
+    private ArrayList<String> arrTimes = new ArrayList<>();
 
-    public GeoLocationsAdapter(Context context, ArrayList<PrefLocationDO> arrTours) {
+    public TrackLocationTimeAdapter(Context context, ArrayList<String> arrTimes) {
         this.context = context;
-        this.arrPrefLocationDO = arrTours;
+        this.arrTimes = arrTimes;
     }
 
-    public void refresh(ArrayList<PrefLocationDO> arrTours) {
-        this.arrPrefLocationDO = arrTours;
+    public void refresh(ArrayList<String> arrTimes) {
+        this.arrTimes = arrTimes;
         notifyDataSetChanged();
     }
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.adapter_cell_geolocation, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.adapter_cell_tourtime, parent, false);
         return new ViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        final PrefLocationDO objTourDO = arrPrefLocationDO.get(position);
+        final String strTime = arrTimes.get(position);
 
-        holder.tvLocationName.setText(objTourDO.LocationName);
-        holder.tvLocationAddress.setText(objTourDO.Address);
+        holder.tvTourTime.setText(strTime);
 
         ((BaseActivity)context).applyTypeface(((BaseActivity)context).getParentView(holder.mView),((BaseActivity)context).tfRegular, Typeface.NORMAL);
     }
 
     @Override
     public int getItemCount() {
-        if(arrPrefLocationDO != null)
-            return arrPrefLocationDO.size();
+        if(arrTimes != null)
+            return arrTimes.size();
 
         return 0;
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
         public final View mView;
-        public final TextView tvLocationName;
-        public final TextView tvLocationAddress;
+        public final TextView tvTourTime;
 
         public ViewHolder(View view) {
             super(view);
             mView = view;
-            tvLocationName      = (TextView) view.findViewById(R.id.tvLocationName);
-            tvLocationAddress   = (TextView) view.findViewById(R.id.tvLocationAddress);
+            tvTourTime      = (TextView) view.findViewById(R.id.tvTourTime);
         }
 
         @Override

@@ -2,6 +2,7 @@ package com.arpaul.geocare.fragment;
 
 import android.content.Intent;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteQueryBuilder;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
@@ -21,9 +22,11 @@ import com.arpaul.geocare.adapter.TrackLocationsAdapter;
 import com.arpaul.geocare.common.ApplicationInstance;
 import com.arpaul.geocare.dataAccess.GCCPConstants;
 import com.arpaul.geocare.dataObject.GeoFenceLocationDO;
+import com.arpaul.utilitieslib.CalendarUtils;
+import com.arpaul.utilitieslib.LogUtils;
 import com.arpaul.utilitieslib.StringUtils;
 
-import java.util.ArrayList;
+import java.util.LinkedHashMap;
 
 /**
  * Created by Aritra on 03-11-2016.
@@ -35,7 +38,7 @@ public class TrackPathFragment extends Fragment implements LoaderManager.LoaderC
     private RecyclerView rvGeoLocations;
     private FloatingActionButton fabGeoFence;
 
-    private ArrayList<GeoFenceLocationDO> arrGeoFenceLocationDO = new ArrayList<>();
+    private LinkedHashMap<String, GeoFenceLocationDO> hashGeoFenceLocationDO = new LinkedHashMap<>();
     private TrackLocationsAdapter adapter;
 
     public static TrackPathFragment newInstance() {
@@ -84,11 +87,19 @@ public class TrackPathFragment extends Fragment implements LoaderManager.LoaderC
     public Loader onCreateLoader(int id, Bundle args) {
         switch (id){
             case ApplicationInstance.LOADER_FETCH_TRACK_LOCATION :
-                return new CursorLoader(getActivity(), GCCPConstants.CONTENT_URI_GEOFENCE_LOC,
+
+                SQLiteQueryBuilder queryBuilder = new SQLiteQueryBuilder();
+
+                queryBuilder.setTables(
+                        GCCPConstants.GEOFENCE_LOCATION_TABLE_NAME + GCCPConstants.TABLE_GROUP_BY + GeoFenceLocationDO.OCCURANCEDATE);
+
+                LogUtils.infoLog("QUERY_FARM_LIST", queryBuilder.getTables());
+
+                return new CursorLoader(getActivity(), GCCPConstants.CONTENT_URI_RELATIONSHIP_JOIN,
                         new String[]{GeoFenceLocationDO.LOCATIONID, GeoFenceLocationDO.LOCATIONNAME, GeoFenceLocationDO.EVENT,
                                 GeoFenceLocationDO.OCCURANCEDATE, GeoFenceLocationDO.OCCURANCETIME},
-                        null,
-                        null,
+                        queryBuilder.getTables()/*GeoFenceLocationDO.OCCURANCEDATE + GCCPConstants.TABLE_QUES*/,
+                        null/*new String[]{CalendarUtils.getDateinPattern(CalendarUtils.DATE_FORMAT1)}*/,
                         null);
             default:
                 return null;
@@ -103,23 +114,39 @@ public class TrackPathFragment extends Fragment implements LoaderManager.LoaderC
                     Cursor cursor = (Cursor) data;
                     if(cursor != null && cursor.moveToFirst()){
                         GeoFenceLocationDO objGeoFenceLocationDO = null;
-                        arrGeoFenceLocationDO.clear();
+                        hashGeoFenceLocationDO.clear();
                         do {
-                            objGeoFenceLocationDO = new GeoFenceLocationDO();
-                            objGeoFenceLocationDO.LocationId = StringUtils.getInt(cursor.getString(cursor.getColumnIndex(GeoFenceLocationDO.LOCATIONID)));
-                            objGeoFenceLocationDO.LocationName = cursor.getString(cursor.getColumnIndex(GeoFenceLocationDO.LOCATIONNAME));
-                            objGeoFenceLocationDO.Event = cursor.getString(cursor.getColumnIndex(GeoFenceLocationDO.EVENT));
-                            objGeoFenceLocationDO.OccuranceDate = cursor.getString(cursor.getColumnIndex(GeoFenceLocationDO.OCCURANCEDATE));
-                            objGeoFenceLocationDO.OccuranceTime = cursor.getString(cursor.getColumnIndex(GeoFenceLocationDO.OCCURANCETIME));
 
-                            arrGeoFenceLocationDO.add(objGeoFenceLocationDO);
+                            int locationId = StringUtils.getInt(cursor.getString(cursor.getColumnIndex(GeoFenceLocationDO.LOCATIONID)));
+                            String locationName = cursor.getString(cursor.getColumnIndex(GeoFenceLocationDO.LOCATIONNAME));
+                            String event = cursor.getString(cursor.getColumnIndex(GeoFenceLocationDO.EVENT));
+                            String occuranceDate = cursor.getString(cursor.getColumnIndex(GeoFenceLocationDO.OCCURANCEDATE));
+                            String occuranceTime = cursor.getString(cursor.getColumnIndex(GeoFenceLocationDO.OCCURANCETIME));
+
+                            objGeoFenceLocationDO = hashGeoFenceLocationDO.get(locationName+"]"+occuranceDate);
+                            if(objGeoFenceLocationDO == null) {
+                                objGeoFenceLocationDO = new GeoFenceLocationDO();
+
+                                objGeoFenceLocationDO.LocationId = locationId;
+                                objGeoFenceLocationDO.LocationName = locationName;
+                                objGeoFenceLocationDO.Event = event;
+                                objGeoFenceLocationDO.OccuranceDate = occuranceDate;
+                                objGeoFenceLocationDO.OccuranceTime = occuranceTime;
+
+                                objGeoFenceLocationDO.arrTimings.add(occuranceTime);
+
+                                hashGeoFenceLocationDO.put(locationName+"]"+occuranceDate, objGeoFenceLocationDO);
+                            } else {
+                                objGeoFenceLocationDO.arrTimings.add(occuranceTime);
+                            }
+//                            hashGeoFenceLocationDO.add(objGeoFenceLocationDO);
                         } while (cursor.moveToNext());
 
-                        if(arrGeoFenceLocationDO != null && arrGeoFenceLocationDO.size() > 0){
+                        if(hashGeoFenceLocationDO != null && hashGeoFenceLocationDO.size() > 0){
                             tvNoLocations.setVisibility(View.GONE);
                             rvGeoLocations.setVisibility(View.VISIBLE);
 
-                            adapter.refresh(arrGeoFenceLocationDO);
+                            adapter.refresh(hashGeoFenceLocationDO);
                         } else {
                             tvNoLocations.setVisibility(View.VISIBLE);
                             rvGeoLocations.setVisibility(View.GONE);
@@ -140,7 +167,7 @@ public class TrackPathFragment extends Fragment implements LoaderManager.LoaderC
         tvNoLocations = (TextView) view.findViewById(R.id.tvNoLocations);
         rvGeoLocations = (RecyclerView) view.findViewById(R.id.rvGeoLocations);
 
-        adapter = new TrackLocationsAdapter(getActivity(), new ArrayList<GeoFenceLocationDO>());
+        adapter = new TrackLocationsAdapter(getActivity(), new LinkedHashMap<String, GeoFenceLocationDO>());
         rvGeoLocations.setAdapter(adapter);
     }
 }

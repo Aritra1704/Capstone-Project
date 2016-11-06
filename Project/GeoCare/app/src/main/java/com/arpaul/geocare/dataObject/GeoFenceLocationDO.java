@@ -1,5 +1,7 @@
 package com.arpaul.geocare.dataObject;
 
+import java.util.ArrayList;
+
 /**
  * Created by Aritra on 6/15/2016.
  */
@@ -12,6 +14,8 @@ public class GeoFenceLocationDO extends BaseDO {
     public String Event                 = "";
     public String OccuranceDate         = "";
     public String OccuranceTime         = "";
+
+    public ArrayList<String> arrTimings = new ArrayList<>();
 
     public static final String LOCATIONID       = "LOCATIONID";
     public static final String LOCATIONNAME     = "LOCATIONNAME";

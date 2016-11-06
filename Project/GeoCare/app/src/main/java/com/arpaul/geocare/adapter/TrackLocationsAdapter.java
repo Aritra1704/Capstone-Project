@@ -9,69 +9,119 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.arpaul.geocare.BaseActivity;
+import com.arpaul.geocare.DashboardActivity;
 import com.arpaul.geocare.R;
 import com.arpaul.geocare.dataObject.GeoFenceLocationDO;
-import com.arpaul.geocare.dataObject.PrefLocationDO;
 import com.arpaul.utilitieslib.CalendarUtils;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.Set;
 
 /**
  * Created by Aritra on 23-06-2016.
  */
-public class TrackLocationsAdapter extends RecyclerView.Adapter<TrackLocationsAdapter.ViewHolder> {
+public class TrackLocationsAdapter extends RecyclerView.Adapter<TrackLocationsAdapter.ParentViewHolder> {
 
     private Context context;
-    private ArrayList<GeoFenceLocationDO> arrTours = new ArrayList<>();
+    private LinkedHashMap<String, GeoFenceLocationDO> hashGeoLocs = new LinkedHashMap<>();
+    private ArrayList<String> arrLocationNames = new ArrayList<>();
+    private TrackLocationTimeAdapter childAdapter = null;
 
-    public TrackLocationsAdapter(Context context, ArrayList<GeoFenceLocationDO> arrTours) {
+    public TrackLocationsAdapter(Context context, LinkedHashMap<String, GeoFenceLocationDO> hashGeoLocs) {
         this.context = context;
-        this.arrTours = arrTours;
+        this.hashGeoLocs = hashGeoLocs;
+        childAdapter = new TrackLocationTimeAdapter(context, new ArrayList<String>());
     }
 
-    public void refresh(ArrayList<GeoFenceLocationDO> arrTours) {
-        this.arrTours = arrTours;
+    public void refresh(LinkedHashMap<String, GeoFenceLocationDO> arrTours) {
+        this.hashGeoLocs = arrTours;
         notifyDataSetChanged();
     }
 
     @Override
-    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.adapter_cell_tours, parent, false);
-        return new ViewHolder(view);
+    public ParentViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.adapter_cell_track, parent, false);
+        return new ParentViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
-        final GeoFenceLocationDO objTourDO = arrTours.get(position);
+    public void onBindViewHolder(final ParentViewHolder holder, final int position) {
+        final GeoFenceLocationDO objGeoFenceLocDO = hashGeoLocs.get(arrLocationNames.get(position));
 
-        holder.tvTourName.setText(objTourDO.LocationName);
+        holder.tvTourName.setText(objGeoFenceLocDO.LocationName);
 
-        String descrip = objTourDO.Event + " at " +
-                CalendarUtils.getDateinPattern(objTourDO.OccuranceDate, CalendarUtils.DATE_FORMAT1, CalendarUtils.DATE_FORMAT_WITH_COMMA) + " " +
-                CalendarUtils.getDateinPattern(objTourDO.OccuranceTime, CalendarUtils.TIME_SEC_FORMAT, CalendarUtils.TIME_HOUR_MINUTE);
+        String descrip = objGeoFenceLocDO.Event + " at " +
+                CalendarUtils.getDateinPattern(objGeoFenceLocDO.OccuranceDate, CalendarUtils.DATE_FORMAT1, CalendarUtils.DATE_FORMAT_WITH_COMMA);
+//                CalendarUtils.getDateinPattern(objGeoFenceLocDO.OccuranceTime, CalendarUtils.TIME_SEC_FORMAT, CalendarUtils.TIME_HOUR_MINUTE);
         holder.tvTourDesc.setText(descrip);
+
+        if(context instanceof DashboardActivity && ((DashboardActivity)context).trackClickPosition == position){
+            childAdapter.refresh(objGeoFenceLocDO.arrTimings);
+            holder.rvChild.setVisibility(View.VISIBLE);
+        } else {
+            holder.rvChild.setVisibility(View.GONE);
+        }
+
+        holder.tvTourName.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                holder.mView.performClick();
+            }
+        });
+
+        holder.tvTourDesc.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                holder.mView.performClick();
+            }
+        });
+
+        holder.mView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                if(context instanceof DashboardActivity){
+                    ((DashboardActivity)context).trackClickPosition = position;
+                    notifyDataSetChanged();
+                }
+            }
+        });
 
         ((BaseActivity)context).applyTypeface(((BaseActivity)context).getParentView(holder.mView),((BaseActivity)context).tfRegular, Typeface.NORMAL);
     }
 
     @Override
     public int getItemCount() {
-        if(arrTours != null)
-            return arrTours.size();
+        if(hashGeoLocs != null) {
+            getLocationNames();
+            return hashGeoLocs.size();
+        }
 
         return 0;
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
+    private void getLocationNames() {
+        Set<String> keyStack = hashGeoLocs.keySet();
+        arrLocationNames = new ArrayList<String>(keyStack);
+//        for(int i = 0; i < arrLocationNames.size(); i++) {
+//            String name = arrLocationNames.get(i);
+//            arrLocationNames.set(i, name.split("]")[1]);
+//        }
+    }
+
+    public class ParentViewHolder extends RecyclerView.ViewHolder {
         public final View mView;
         public final TextView tvTourName;
         public final TextView tvTourDesc;
+        public final RecyclerView rvChild;
 
-        public ViewHolder(View view) {
+        public ParentViewHolder(View view) {
             super(view);
             mView = view;
             tvTourName                  = (TextView) view.findViewById(R.id.tvLocationName);
             tvTourDesc                  = (TextView) view.findViewById(R.id.tvLocationAddress);
+            rvChild                     = (RecyclerView) view.findViewById(R.id.rvChild);
         }
 
         @Override

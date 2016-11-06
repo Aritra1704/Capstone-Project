@@ -36,6 +36,7 @@ public class DashboardActivity extends BaseActivity {
     private ViewPager mViewPager;
     private Toolbar toolbar;
     private PagerTitleStrip ptsDashboard;
+    public int trackClickPosition = -1;
 
     @Override
     public void initialize() {

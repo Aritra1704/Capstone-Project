@@ -42,6 +42,8 @@ public class GCCPConstants {
     public static final String TABLE_LIKE  = " LIKE ? ";
     public static final String TABLE_NOT_QUES  = " != ? ";
     public static final String TABLE_IN_BRACKET  = " ( ? ) ";
+    public static final String TABLE_GROUP_BY  = " GROUP BY ";
+    public static final String TABLE_DATE  = " DATE";
 
     public static final String CONTENT = "content://";
     public static final Uri BASE_CONTENT_URI = Uri.parse(CONTENT + CONTENT_AUTHORITY);
