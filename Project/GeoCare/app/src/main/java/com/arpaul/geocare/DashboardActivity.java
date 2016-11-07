@@ -36,7 +36,6 @@ public class DashboardActivity extends BaseActivity {
     private ViewPager mViewPager;
     private Toolbar toolbar;
     private PagerTitleStrip ptsDashboard;
-    public int trackClickPosition = -1;
 
     @Override
     public void initialize() {
@@ -51,32 +50,6 @@ public class DashboardActivity extends BaseActivity {
     private void bindControls(){
 //        setTitle("You");
     }
-
-//    @Override
-//    public boolean onCreateOptionsMenu(Menu menu) {
-//        // Inflate the menu; this adds items to the action bar if it is present.
-//        getMenuInflater().inflate(R.menu.menu_base, menu);
-//        return true;
-//    }
-//
-//    @Override
-//    public boolean onOptionsItemSelected(MenuItem item) {
-//        // Handle action bar item clicks here. The action bar will
-//        // automatically handle clicks on the Home/Up button, so long
-//        // as you specify a parent activity in AndroidManifest.xml.
-//        int id = item.getItemId();
-//
-//        //noinspection SimplifiableIfStatement
-//        if (id == R.id.action_settings) {
-//            startActivity(new Intent(this, /*SettingsActivity*/GeocareSettingsActivity.class));
-//            return true;
-//        } else if (id == R.id.action_signin) {
-//            startActivity(new Intent(this, SignInActivity.class));
-//            return true;
-//        }
-//
-//        return super.onOptionsItemSelected(item);
-//    }
 
     /**
      * A {@link FragmentPagerAdapter} that returns a fragment corresponding to

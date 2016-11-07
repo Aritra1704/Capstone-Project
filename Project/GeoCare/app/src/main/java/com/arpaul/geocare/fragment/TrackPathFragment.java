@@ -19,6 +19,7 @@ import android.widget.TextView;
 import com.arpaul.geocare.GeoFenceActivity;
 import com.arpaul.geocare.R;
 import com.arpaul.geocare.adapter.TrackLocationsAdapter;
+import com.arpaul.geocare.common.AppConstant;
 import com.arpaul.geocare.common.ApplicationInstance;
 import com.arpaul.geocare.dataAccess.GCCPConstants;
 import com.arpaul.geocare.dataObject.GeoFenceLocationDO;
@@ -70,6 +71,8 @@ public class TrackPathFragment extends Fragment implements LoaderManager.LoaderC
                 startActivity(new Intent(getActivity(), GeoFenceActivity.class));
             }
         });
+
+        AppConstant.trackClickPosition = -1;
     }
 
     @Override

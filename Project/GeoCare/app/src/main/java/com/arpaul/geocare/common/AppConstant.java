@@ -41,6 +41,8 @@ public class AppConstant {
     public static final String EXTERNAL_FILENAME   = "GeoCare.txt";
     public static FirebaseAuth mFirebaseAuth;;
 
+    public static int trackClickPosition = -1;
+
     public static void writeFile(String mValue) {
 
         try {

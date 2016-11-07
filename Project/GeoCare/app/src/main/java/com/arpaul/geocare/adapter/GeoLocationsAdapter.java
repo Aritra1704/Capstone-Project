@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 
 import com.arpaul.geocare.BaseActivity;
@@ -45,6 +46,13 @@ public class GeoLocationsAdapter extends RecyclerView.Adapter<GeoLocationsAdapte
 
         holder.tvLocationName.setText(objTourDO.LocationName);
         holder.tvLocationAddress.setText(objTourDO.Address);
+
+        holder.mView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(context, objTourDO.LocationName, Toast.LENGTH_SHORT).show();
+            }
+        });
 
         ((BaseActivity)context).applyTypeface(((BaseActivity)context).getParentView(holder.mView),((BaseActivity)context).tfRegular, Typeface.NORMAL);
     }

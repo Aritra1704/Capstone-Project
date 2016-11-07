@@ -7,10 +7,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.arpaul.geocare.BaseActivity;
 import com.arpaul.geocare.DashboardActivity;
 import com.arpaul.geocare.R;
+import com.arpaul.geocare.common.AppConstant;
 import com.arpaul.geocare.dataObject.GeoFenceLocationDO;
 import com.arpaul.utilitieslib.CalendarUtils;
 
@@ -56,7 +58,7 @@ public class TrackLocationsAdapter extends RecyclerView.Adapter<TrackLocationsAd
 //                CalendarUtils.getDateinPattern(objGeoFenceLocDO.OccuranceTime, CalendarUtils.TIME_SEC_FORMAT, CalendarUtils.TIME_HOUR_MINUTE);
         holder.tvTourDesc.setText(descrip);
 
-        if(context instanceof DashboardActivity && ((DashboardActivity)context).trackClickPosition == position){
+        if(AppConstant.trackClickPosition == position){
             childAdapter.refresh(objGeoFenceLocDO.arrTimings);
             holder.rvChild.setVisibility(View.VISIBLE);
         } else {
@@ -81,10 +83,9 @@ public class TrackLocationsAdapter extends RecyclerView.Adapter<TrackLocationsAd
             @Override
             public void onClick(View v) {
 
-                if(context instanceof DashboardActivity){
-                    ((DashboardActivity)context).trackClickPosition = position;
-                    notifyDataSetChanged();
-                }
+                AppConstant.trackClickPosition = position;
+                notifyDataSetChanged();
+                Toast.makeText(context, arrLocationNames.get(position), Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -122,6 +123,7 @@ public class TrackLocationsAdapter extends RecyclerView.Adapter<TrackLocationsAd
             tvTourName                  = (TextView) view.findViewById(R.id.tvLocationName);
             tvTourDesc                  = (TextView) view.findViewById(R.id.tvLocationAddress);
             rvChild                     = (RecyclerView) view.findViewById(R.id.rvChild);
+            rvChild.setAdapter(childAdapter);
         }
 
         @Override
