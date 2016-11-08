@@ -9,7 +9,7 @@
     android:padding="@dimen/margin_5">
 
     <LinearLayout
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:clickable="true"
         android:orientation="horizontal"
@@ -17,29 +17,31 @@
 
         <TextView
             android:id="@+id/tvLocationName"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:text="Tour"
             android:textColor="@color/color_Black"
             android:textSize="@dimen/textsize_18" />
 
+        <TextView
+            android:id="@+id/tvLocationAddress"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="@dimen/margin_5"
+            android:paddingLeft="@dimen/margin_5"
+            android:text="Tour desc"
+            android:textColor="@color/color_Black"
+            android:textSize="@dimen/textsize_12" />
     </LinearLayout>
 
-    <TextView
-        android:id="@+id/tvLocationAddress"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:paddingLeft="@dimen/margin_5"
-        android:text="Tour desc"
-        android:textColor="@color/color_Black"
-        android:textSize="@dimen/textsize_12" />
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/rvChild"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:visibility="gone"
+        android:layout_height="wrap_content"
         android:padding="@dimen/margin_5"
+        android:visibility="gone"
         app:layoutManager="LinearLayoutManager">
 
     </android.support.v7.widget.RecyclerView>

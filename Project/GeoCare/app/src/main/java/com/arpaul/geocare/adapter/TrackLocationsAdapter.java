@@ -10,7 +10,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.arpaul.geocare.BaseActivity;
-import com.arpaul.geocare.DashboardActivity;
 import com.arpaul.geocare.R;
 import com.arpaul.geocare.common.AppConstant;
 import com.arpaul.geocare.dataObject.GeoFenceLocationDO;
@@ -53,7 +52,7 @@ public class TrackLocationsAdapter extends RecyclerView.Adapter<TrackLocationsAd
 
         holder.tvTourName.setText(objGeoFenceLocDO.LocationName);
 
-        String descrip = objGeoFenceLocDO.Event + " at " +
+        String descrip = /*objGeoFenceLocDO.Event + " at " +*/
                 CalendarUtils.getDateinPattern(objGeoFenceLocDO.OccuranceDate, CalendarUtils.DATE_FORMAT1, CalendarUtils.DATE_FORMAT_WITH_COMMA);
 //                CalendarUtils.getDateinPattern(objGeoFenceLocDO.OccuranceTime, CalendarUtils.TIME_SEC_FORMAT, CalendarUtils.TIME_HOUR_MINUTE);
         holder.tvTourDesc.setText(descrip);
@@ -85,7 +84,7 @@ public class TrackLocationsAdapter extends RecyclerView.Adapter<TrackLocationsAd
 
                 AppConstant.trackClickPosition = position;
                 notifyDataSetChanged();
-                Toast.makeText(context, arrLocationNames.get(position), Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, arrLocationNames.get(position) + " " + objGeoFenceLocDO.arrTimings.size(), Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -123,6 +122,7 @@ public class TrackLocationsAdapter extends RecyclerView.Adapter<TrackLocationsAd
             tvTourName                  = (TextView) view.findViewById(R.id.tvLocationName);
             tvTourDesc                  = (TextView) view.findViewById(R.id.tvLocationAddress);
             rvChild                     = (RecyclerView) view.findViewById(R.id.rvChild);
+
             rvChild.setAdapter(childAdapter);
         }
 

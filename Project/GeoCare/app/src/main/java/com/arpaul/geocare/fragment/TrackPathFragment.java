@@ -91,17 +91,17 @@ public class TrackPathFragment extends Fragment implements LoaderManager.LoaderC
         switch (id){
             case ApplicationInstance.LOADER_FETCH_TRACK_LOCATION :
 
-                SQLiteQueryBuilder queryBuilder = new SQLiteQueryBuilder();
+//                SQLiteQueryBuilder queryBuilder = new SQLiteQueryBuilder();
+//
+//                queryBuilder.setTables(
+//                        GCCPConstants.GEOFENCE_LOCATION_TABLE_NAME + GCCPConstants.TABLE_GROUP_BY + GeoFenceLocationDO.OCCURANCEDATE);
 
-                queryBuilder.setTables(
-                        GCCPConstants.GEOFENCE_LOCATION_TABLE_NAME + GCCPConstants.TABLE_GROUP_BY + GeoFenceLocationDO.OCCURANCEDATE);
+//                LogUtils.infoLog("QUERY_FARM_LIST", queryBuilder.getTables());
 
-                LogUtils.infoLog("QUERY_FARM_LIST", queryBuilder.getTables());
-
-                return new CursorLoader(getActivity(), GCCPConstants.CONTENT_URI_RELATIONSHIP_JOIN,
+                return new CursorLoader(getActivity(), GCCPConstants.CONTENT_URI_GEOFENCE_LOC,
                         new String[]{GeoFenceLocationDO.LOCATIONID, GeoFenceLocationDO.LOCATIONNAME, GeoFenceLocationDO.EVENT,
                                 GeoFenceLocationDO.OCCURANCEDATE, GeoFenceLocationDO.OCCURANCETIME},
-                        queryBuilder.getTables()/*GeoFenceLocationDO.OCCURANCEDATE + GCCPConstants.TABLE_QUES*/,
+                        null/*queryBuilder.getTables()*//*GeoFenceLocationDO.OCCURANCEDATE + GCCPConstants.TABLE_QUES*/,
                         null/*new String[]{CalendarUtils.getDateinPattern(CalendarUtils.DATE_FORMAT1)}*/,
                         null);
             default:
@@ -136,11 +136,11 @@ public class TrackPathFragment extends Fragment implements LoaderManager.LoaderC
                                 objGeoFenceLocationDO.OccuranceDate = occuranceDate;
                                 objGeoFenceLocationDO.OccuranceTime = occuranceTime;
 
-                                objGeoFenceLocationDO.arrTimings.add(occuranceTime);
+                                objGeoFenceLocationDO.arrTimings.add(event + "]" + occuranceTime);
 
                                 hashGeoFenceLocationDO.put(locationName+"]"+occuranceDate, objGeoFenceLocationDO);
                             } else {
-                                objGeoFenceLocationDO.arrTimings.add(occuranceTime);
+                                objGeoFenceLocationDO.arrTimings.add(event + "]" + occuranceTime);
                             }
 //                            hashGeoFenceLocationDO.add(objGeoFenceLocationDO);
                         } while (cursor.moveToNext());

@@ -41,7 +41,10 @@ public class TrackLocationTimeAdapter extends RecyclerView.Adapter<TrackLocation
     public void onBindViewHolder(ViewHolder holder, int position) {
         final String strTime = arrTimes.get(position);
 
-        holder.tvTourTime.setText(strTime);
+        String event[] = strTime.split("]");
+
+        holder.tvTourEvent.setText(event[0]);
+        holder.tvTourTime.setText(event[1]);
 
         ((BaseActivity)context).applyTypeface(((BaseActivity)context).getParentView(holder.mView),((BaseActivity)context).tfRegular, Typeface.NORMAL);
     }
@@ -57,11 +60,13 @@ public class TrackLocationTimeAdapter extends RecyclerView.Adapter<TrackLocation
     public class ViewHolder extends RecyclerView.ViewHolder {
         public final View mView;
         public final TextView tvTourTime;
+        public final TextView tvTourEvent;
 
         public ViewHolder(View view) {
             super(view);
             mView = view;
             tvTourTime      = (TextView) view.findViewById(R.id.tvTourTime);
+            tvTourEvent     = (TextView) view.findViewById(R.id.tvTourEvent);
         }
 
         @Override
