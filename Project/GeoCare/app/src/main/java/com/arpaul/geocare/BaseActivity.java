@@ -37,6 +37,8 @@ import com.arpaul.utilitieslib.FileUtils;
 import com.arpaul.utilitieslib.LogUtils;
 import com.arpaul.utilitieslib.PermissionUtils;
 import com.arpaul.utilitieslib.UnCaughtException;
+import com.google.android.gms.appinvite.AppInviteInvitation;
+import com.google.firebase.analytics.FirebaseAnalytics;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -54,6 +56,8 @@ public abstract class BaseActivity extends AppCompatActivity implements PopupLis
     private CustomDialog cDialog;
     public AppPreference preference;
     public Typeface tfRegular,tfBold;
+    public FirebaseAnalytics mFirebaseAnalytics;
+    private final String BASE_TAG = "BaseActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -134,6 +138,8 @@ public abstract class BaseActivity extends AppCompatActivity implements PopupLis
         if(preference == null)
             preference = new AppPreference(this);
 
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
+
         setTitle("You");
     }
 
@@ -162,6 +168,30 @@ public abstract class BaseActivity extends AppCompatActivity implements PopupLis
 
             if(copyFile == 2)
                 copyFile();
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        LogUtils.debugLog(BASE_TAG, "onActivityResult: requestCode=" + requestCode + ", resultCode=" + resultCode);
+
+        if (requestCode == AppConstant.REQUEST_INVITE) {
+            if (resultCode == RESULT_OK) {
+                Bundle payload = new Bundle();
+                payload.putString(FirebaseAnalytics.Param.VALUE, "sent");
+                mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.SHARE, payload);
+                // Check how many invitations were sent and log.
+                String[] ids = AppInviteInvitation.getInvitationIds(resultCode, data);
+                LogUtils.debugLog(BASE_TAG, "Invitations sent: " + ids.length);
+            } else {
+                Bundle payload = new Bundle();
+                payload.putString(FirebaseAnalytics.Param.VALUE, "not sent");
+                mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.SHARE, payload);
+                // Sending failed or it was canceled, show failure message to
+                // the user
+                LogUtils.debugLog(BASE_TAG, "Failed to send invitation.");
+            }
         }
     }
 

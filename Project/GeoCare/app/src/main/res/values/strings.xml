@@ -56,8 +56,13 @@
         and that your device has an internet connection.
     </string>
     <string name="sign_out">Sign Out</string>
+    <string name="connect">Connect</string>
     <string name="disconnect">Disconnect</string>
     <string name="signed_in_fmt">Signed In as %s</string>
+
+    <string name="invitation_title">Geocare Invitation</string>
+    <string name="invitation_message">Geocare Invitation message</string>
+    <string name="invitation_cta">Geocare Action</string>
 
     <!-- Strings related to Settings -->
 

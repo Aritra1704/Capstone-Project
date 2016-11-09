@@ -42,6 +42,7 @@ public class AppConstant {
     public static FirebaseAuth mFirebaseAuth;;
 
     public static int trackClickPosition = -1;
+    public static int REQUEST_INVITE = 1501;
 
     public static void writeFile(String mValue) {
 

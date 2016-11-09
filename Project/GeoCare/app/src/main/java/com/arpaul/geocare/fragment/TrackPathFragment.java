@@ -103,7 +103,7 @@ public class TrackPathFragment extends Fragment implements LoaderManager.LoaderC
                                 GeoFenceLocationDO.OCCURANCEDATE, GeoFenceLocationDO.OCCURANCETIME},
                         null/*queryBuilder.getTables()*//*GeoFenceLocationDO.OCCURANCEDATE + GCCPConstants.TABLE_QUES*/,
                         null/*new String[]{CalendarUtils.getDateinPattern(CalendarUtils.DATE_FORMAT1)}*/,
-                        null);
+                        GeoFenceLocationDO.OCCURANCEDATE + GCCPConstants.TABLE_DESC);
             default:
                 return null;
         }
