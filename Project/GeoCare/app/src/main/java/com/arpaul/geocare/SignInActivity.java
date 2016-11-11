@@ -11,6 +11,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.arpaul.geocare.common.AppConstant;
+import com.google.android.gms.appinvite.AppInvite;
 import com.google.android.gms.appinvite.AppInviteInvitation;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -75,6 +76,7 @@ public class SignInActivity extends BaseActivity implements GoogleApiClient.OnCo
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .enableAutoManage(this , this )
                 .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
+                .addApi(AppInvite.API)
                 .build();
 
         // Initialize FirebaseAuth
