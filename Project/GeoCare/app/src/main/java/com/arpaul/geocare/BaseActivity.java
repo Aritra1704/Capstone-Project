@@ -127,6 +127,9 @@ public abstract class BaseActivity extends AppCompatActivity implements PopupLis
         } else if (id == R.id.action_signin) {
             startActivity(new Intent(this, SignInActivity.class));
             return true;
+        } else if (id == R.id.action_chat) {
+            startActivity(new Intent(this, ChatActivity.class));
+            return true;
         }
 
         return super.onOptionsItemSelected(item);

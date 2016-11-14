@@ -2,6 +2,7 @@ package com.arpaul.geocare;
 
 import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -73,6 +74,8 @@ public class LocationSearchActivity extends BaseActivity implements GPSCallback,
     private MaterialDialog mdFilter;
     private static int HANDLER_TIME_OUT = 2500;
     private int locationId = 1;
+
+    //https://classroom.udacity.com/courses/ud0352/lessons/daa58d76-0146-4c52-b5d8-45e32a3dfb08/concepts/ef189a80-7f09-47cc-87c8-dc101ead7a1e
 
     @Override
     public void initialize() {
@@ -284,11 +287,30 @@ public class LocationSearchActivity extends BaseActivity implements GPSCallback,
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
         if (requestCode == 1) {
-            ispermissionGranted = true;
-            gpsUtills.connectGoogleApiClient();
-            createGPSUtils();
 
-            getCurrentLocation();
+            int location = 0;
+            for (int i = 0; i < permissions.length; i++) {
+                String permission = permissions[i];
+                int grantResult = grantResults[i];
+
+                if (permission.equals(Manifest.permission.ACCESS_COARSE_LOCATION) &&
+                        grantResult == PackageManager.PERMISSION_GRANTED) {
+                    location++;
+                } else if (permission.equals(Manifest.permission.ACCESS_FINE_LOCATION) &&
+                        grantResult == PackageManager.PERMISSION_GRANTED) {
+                    location++;
+                }
+            }
+
+            if(location == 2) {
+                ispermissionGranted = true;
+                gpsUtills.connectGoogleApiClient();
+                createGPSUtils();
+
+                getCurrentLocation();
+            } else {
+                showCustomDialog(getString(R.string.gpssettings),getString(R.string.allow_app_access_location),getString(R.string.ok),null,getString(R.string.allow_app_access_location), CustomPopupType.DIALOG_ALERT,false);
+            }
         }
     }
 

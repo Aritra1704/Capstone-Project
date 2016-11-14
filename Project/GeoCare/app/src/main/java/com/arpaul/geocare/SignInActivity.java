@@ -176,8 +176,14 @@ public class SignInActivity extends BaseActivity implements GoogleApiClient.OnCo
         } else if (requestCode == AppConstant.REQUEST_INVITE) {
             if (resultCode == RESULT_OK) {
                 // Check how many invitations were sent.
-                String[] ids = AppInviteInvitation.getInvitationIds(resultCode, data);
+                final String[] ids = AppInviteInvitation.getInvitationIds(resultCode, data);
                 Log.d(TAG, "Invitations sent: " + ids.length);
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(SignInActivity.this, "Invitations sent: " + ids.length, Toast.LENGTH_LONG).show();
+                    }
+                });
             } else {
                 // Sending failed or it was canceled, show failure message to
                 // the user
