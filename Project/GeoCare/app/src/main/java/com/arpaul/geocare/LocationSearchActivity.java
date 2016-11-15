@@ -1,13 +1,18 @@
 package com.arpaul.geocare;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.location.Location;
+import android.location.LocationManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.text.TextUtils;
@@ -24,6 +29,7 @@ import android.widget.Toast;
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.arpaul.customalertlibrary.popups.statingDialog.CustomPopupType;
+import com.arpaul.geocare.common.AppConstant;
 import com.arpaul.geocare.common.AppPreference;
 import com.arpaul.geocare.common.ApplicationInstance;
 import com.arpaul.geocare.dataAccess.GCCPConstants;
@@ -31,32 +37,40 @@ import com.arpaul.geocare.dataAccess.InsertDataType;
 import com.arpaul.geocare.dataAccess.InsertLoader;
 import com.arpaul.geocare.dataObject.PrefLocationDO;
 import com.arpaul.geocare.geoFence.GeoFenceNotiService;
+import com.arpaul.geocare.geoFence.GeofenceErrorMessages;
 import com.arpaul.gpslibrary.fetchAddressGeoCode.AddressConstants;
 import com.arpaul.gpslibrary.fetchAddressGeoCode.AddressDO;
 import com.arpaul.gpslibrary.fetchAddressGeoCode.FetchAddressLoader;
 import com.arpaul.gpslibrary.fetchAddressGeoCode.FetchGeoCodeLoader;
-import com.arpaul.gpslibrary.fetchLocation.GPSCallback;
 import com.arpaul.gpslibrary.fetchLocation.GPSErrorCode;
-import com.arpaul.gpslibrary.fetchLocation.GPSUtills;
 import com.arpaul.utilitieslib.LogUtils;
 import com.arpaul.utilitieslib.PermissionUtils;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.common.api.Status;
+import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.LatLng;
 
 /**
  * Created by ARPaul on 29-10-2016.
  */
 
-public class LocationSearchActivity extends BaseActivity implements GPSCallback,
+public class LocationSearchActivity extends BaseActivity implements
         OnMapReadyCallback,
-//        GoogleMap.OnCameraChangeListener,
         LoaderManager.LoaderCallbacks,
-//        GoogleMap.OnCameraMoveListener,
         GoogleMap.OnCameraIdleListener,
-        GoogleMap.OnCameraMoveStartedListener {
+        GoogleMap.OnCameraMoveStartedListener,
+        GoogleApiClient.ConnectionCallbacks,
+        GoogleApiClient.OnConnectionFailedListener,
+        LocationListener {
 
     private View llLocSearchActivity;
     private final String LOG_TAG ="FenceLocator";
@@ -68,12 +82,13 @@ public class LocationSearchActivity extends BaseActivity implements GPSCallback,
     private SupportMapFragment mapFragment;
     private LatLng currentLatLng = null;
     private float mZoom = 0.0f;
-    private GPSUtills gpsUtills;
     private boolean isGpsEnabled;
     private boolean ispermissionGranted = false;
     private MaterialDialog mdFilter;
     private static int HANDLER_TIME_OUT = 2500;
     private int locationId = 1;
+    private GoogleApiClient mGoogleApiClient;
+    private LocationRequest mLocationRequest;
 
     //https://classroom.udacity.com/courses/ud0352/lessons/daa58d76-0146-4c52-b5d8-45e32a3dfb08/concepts/ef189a80-7f09-47cc-87c8-dc101ead7a1e
 
@@ -88,17 +103,12 @@ public class LocationSearchActivity extends BaseActivity implements GPSCallback,
     }
 
     private void bindControls(){
-        gpsUtills = GPSUtills.getInstance(LocationSearchActivity.this);
-        gpsUtills.setLogEnable(true);
-        gpsUtills.setPackegeName(getPackageName());
-        gpsUtills.setListner(LocationSearchActivity.this);
-
         if(new PermissionUtils().checkPermission(this, new String[]{
                 Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}) != 0){
             new PermissionUtils().verifyLocation(this,new String[]{
                     Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION});
         } else{
-            createGPSUtils();
+            buildGoogleApiClient();
         }
 
         ivCross.setOnClickListener(new View.OnClickListener() {
@@ -133,8 +143,32 @@ public class LocationSearchActivity extends BaseActivity implements GPSCallback,
         });
     }
 
-    private void createGPSUtils(){
-        gpsUtills.isGpsProviderEnabled();
+    /**
+     * Builds a GoogleApiClient. Uses the {@code #addApi} method to request the LocationServices API.
+     */
+    protected synchronized void buildGoogleApiClient() {
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .addApi(LocationServices.API)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .build();
+
+
+        LocationManager locationManager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
+        boolean isGpsProviderEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+        if(!isGpsProviderEnabled) {
+            showCustomDialog(getString(R.string.gpssettings),getString(R.string.gps_not_enabled),getString(R.string.settings),getString(R.string.cancel),getString(R.string.settings), CustomPopupType.DIALOG_ALERT,false);
+        }
+
+        if(mGoogleApiClient != null)
+            mGoogleApiClient.connect();
+
+        if(isGpsEnabled()) {
+            isGpsEnabled = true;
+        } else {
+            isGpsEnabled = false;
+            showCustomDialog(getString(R.string.gpssettings),getString(R.string.gps_not_enabled),getString(R.string.settings),getString(R.string.cancel),getString(R.string.settings), CustomPopupType.DIALOG_ALERT,false);
+        }
     }
 
     private void saveLocation(){
@@ -259,19 +293,15 @@ public class LocationSearchActivity extends BaseActivity implements GPSCallback,
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
-        if(gpsUtills != null && ispermissionGranted && !isGpsEnabled){
-            gpsUtills.isGpsProviderEnabled();
-        }
+        mMap = googleMap;
+
         if(isGpsEnabled) {
             new Handler().postDelayed(new Runnable()
             {
                 @Override
                 public void run()
                 {
-                    gpsUtills.getCurrentLatLng();
                     showCurrentLocation();
-//                    mMap.setOnCameraChangeListener(LocationSearchActivity.this);
-//                    mMap.setOnCameraMoveListener(LocationSearchActivity.this);
                     mMap.setOnCameraMoveStartedListener(LocationSearchActivity.this);
                     mMap.setOnCameraIdleListener(LocationSearchActivity.this);
                 }
@@ -280,6 +310,28 @@ public class LocationSearchActivity extends BaseActivity implements GPSCallback,
         else if(ispermissionGranted) {
             showSettingsAlert();
         }
+
+//        if(gpsUtills != null && ispermissionGranted && !isGpsEnabled){
+//            gpsUtills.isGpsProviderEnabled();
+//        }
+//        if(isGpsEnabled) {
+//            new Handler().postDelayed(new Runnable()
+//            {
+//                @Override
+//                public void run()
+//                {
+//                    gpsUtills.getCurrentLatLng();
+//                    showCurrentLocation();
+////                    mMap.setOnCameraChangeListener(LocationSearchActivity.this);
+////                    mMap.setOnCameraMoveListener(LocationSearchActivity.this);
+//                    mMap.setOnCameraMoveStartedListener(LocationSearchActivity.this);
+//                    mMap.setOnCameraIdleListener(LocationSearchActivity.this);
+//                }
+//            }, 1000);
+//        }
+//        else if(ispermissionGranted) {
+//            showSettingsAlert();
+//        }
     }
 
     @Override
@@ -304,10 +356,9 @@ public class LocationSearchActivity extends BaseActivity implements GPSCallback,
 
             if(location == 2) {
                 ispermissionGranted = true;
-                gpsUtills.connectGoogleApiClient();
-                createGPSUtils();
+                buildGoogleApiClient();
 
-                getCurrentLocation();
+//                getCurrentLocation();
             } else {
                 showCustomDialog(getString(R.string.gpssettings),getString(R.string.allow_app_access_location),getString(R.string.ok),null,getString(R.string.allow_app_access_location), CustomPopupType.DIALOG_ALERT,false);
             }
@@ -315,51 +366,129 @@ public class LocationSearchActivity extends BaseActivity implements GPSCallback,
     }
 
     @Override
-    public void gotGpsValidationResponse(Object response, GPSErrorCode code)
-    {
-        if(code == GPSErrorCode.EC_GPS_PROVIDER_NOT_ENABLED) {
-            isGpsEnabled = false;
-            showCustomDialog(getString(R.string.gpssettings),getString(R.string.gps_not_enabled),getString(R.string.settings),getString(R.string.cancel),getString(R.string.settings), CustomPopupType.DIALOG_ALERT,false);
-        }
-        else if(code == GPSErrorCode.EC_GPS_PROVIDER_ENABLED) {
-            isGpsEnabled = true;
-            gpsUtills.getCurrentLatLng();
-        }
-        else if(code == GPSErrorCode.EC_UNABLE_TO_FIND_LOCATION) {
-            currentLatLng = (LatLng) response;
-        }
-        else if(code == GPSErrorCode.EC_LOCATION_FOUND) {
-            currentLatLng = (LatLng) response;
-            LogUtils.debugLog("GPSTrack", "Currrent latLng :"+currentLatLng.latitude+" \n"+currentLatLng.longitude);
-
-            //loader.hideLoader();
-            showCurrentLocation();
-            gpsUtills.stopLocationUpdates();
-        }
-        else if(code == GPSErrorCode.EC_CUSTOMER_LOCATION_IS_VALID) {
-        }
-        else if(code == GPSErrorCode.EC_CUSTOMER_lOCATION_IS_INVAILD) {
-        }
-        else if(code == GPSErrorCode.EC_DEVICE_CONFIGURED_PROPERLY) {
-            startIntentService();
+    protected void onStart() {
+        super.onStart();
+        if (mGoogleApiClient != null && (!mGoogleApiClient.isConnecting() || !mGoogleApiClient.isConnected())) {
+            mGoogleApiClient.connect();
         }
     }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if (mGoogleApiClient.isConnecting() || mGoogleApiClient.isConnected()) {
+            mGoogleApiClient.disconnect();
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+    }
+
+    @Override
+    public void onConnected(@Nullable Bundle bundle) {
+        LogUtils.infoLog(LOG_TAG, "Connected to GoogleApiClient");
+
+        Location location = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+        if(location != null){
+            currentLatLng = new LatLng(location.getLatitude(), location.getLongitude());
+
+            if(getSupportLoaderManager().getLoader(ApplicationInstance.LOADER_FETCH_ALL_LOCATION) != null)
+                getSupportLoaderManager().restartLoader(ApplicationInstance.LOADER_FETCH_ALL_LOCATION, null, this);
+            else
+                getSupportLoaderManager().initLoader(ApplicationInstance.LOADER_FETCH_ALL_LOCATION, null, this);
+
+        } //else {
+        mLocationRequest = LocationRequest.create();
+        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        mLocationRequest.setInterval(AppConstant.LOCATION_UPDATES_IN_SECONDS * 1000); // Update location every second
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if(checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED ){
+                LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
+            }
+        } else
+            LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
+        //}
+    }
+
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+        LogUtils.infoLog(LOG_TAG, "GoogleApiClient connection has failed");
+        mGoogleApiClient.connect();
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+        LogUtils.infoLog(LOG_TAG, "GoogleApiClient connection has been suspend");
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+        LogUtils.infoLog(LOG_TAG, location.toString());
+
+        currentLatLng = new LatLng(location.getLatitude(), location.getLongitude());
+
+        Toast.makeText(LocationSearchActivity.this, "Lat: "+currentLatLng.latitude+" Lon: "+currentLatLng.longitude, Toast.LENGTH_SHORT).show();
+        showCurrentLocation();
+    }
+
+    private boolean isGpsEnabled(){
+        LocationManager locationManager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
+        boolean isGpsProviderEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+        return isGpsProviderEnabled;
+    }
+
+//    @Override
+//    public void gotGpsValidationResponse(Object response, GPSErrorCode code)
+//    {
+//        if(code == GPSErrorCode.EC_GPS_PROVIDER_NOT_ENABLED) {
+//            isGpsEnabled = false;
+//            showCustomDialog(getString(R.string.gpssettings),getString(R.string.gps_not_enabled),getString(R.string.settings),getString(R.string.cancel),getString(R.string.settings), CustomPopupType.DIALOG_ALERT,false);
+//        }
+//        else if(code == GPSErrorCode.EC_GPS_PROVIDER_ENABLED) {
+//            isGpsEnabled = true;
+//            gpsUtills.getCurrentLatLng();
+//        }
+//        else if(code == GPSErrorCode.EC_UNABLE_TO_FIND_LOCATION) {
+//            currentLatLng = (LatLng) response;
+//        }
+//        else if(code == GPSErrorCode.EC_LOCATION_FOUND) {
+//            currentLatLng = (LatLng) response;
+//            LogUtils.debugLog("GPSTrack", "Currrent latLng :"+currentLatLng.latitude+" \n"+currentLatLng.longitude);
+//
+//            //loader.hideLoader();
+//            showCurrentLocation();
+//            gpsUtills.stopLocationUpdates();
+//        }
+//        else if(code == GPSErrorCode.EC_CUSTOMER_LOCATION_IS_VALID) {
+//        }
+//        else if(code == GPSErrorCode.EC_CUSTOMER_lOCATION_IS_INVAILD) {
+//        }
+//        else if(code == GPSErrorCode.EC_DEVICE_CONFIGURED_PROPERLY) {
+//            startIntentService();
+//        }
+//    }
 
     protected void startIntentService() {
-        getSupportLoaderManager().restartLoader(ApplicationInstance.LOADER_FETCH_ADDRESS, null, this).forceLoad();
+        if(getSupportLoaderManager().getLoader(ApplicationInstance.LOADER_FETCH_ADDRESS) == null)
+            getSupportLoaderManager().initLoader(ApplicationInstance.LOADER_FETCH_ADDRESS, null, this).forceLoad();
+        else
+            getSupportLoaderManager().restartLoader(ApplicationInstance.LOADER_FETCH_ADDRESS, null, this).forceLoad();
     }
 
-    private void getCurrentLocation(){
-        new Handler().postDelayed(new Runnable()
-        {
-            @Override
-            public void run()
-            {
-                gpsUtills.getCurrentLatLng();
-                showCurrentLocation();
-            }
-        }, 2 * 1000);
-    }
+//    private void getCurrentLocation(){
+//        new Handler().postDelayed(new Runnable()
+//        {
+//            @Override
+//            public void run()
+//            {
+//                gpsUtills.getCurrentLatLng();
+//                showCurrentLocation();
+//            }
+//        }, 2 * 1000);
+//    }
 
     private void showCurrentLocation(){
         if(currentLatLng != null)
@@ -373,8 +502,6 @@ public class LocationSearchActivity extends BaseActivity implements GPSCallback,
                 mMap.addMarker(markerOptions);*/
                 mZoom = 18.0f;
                 mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng,mZoom));
-
-                getSupportLoaderManager().initLoader(ApplicationInstance.LOADER_FETCH_ADDRESS, null, this).forceLoad();
             }
         }
         else {
@@ -393,22 +520,6 @@ public class LocationSearchActivity extends BaseActivity implements GPSCallback,
         edtAddress.setText(message);
     }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
-        if(gpsUtills != null && ispermissionGranted){
-            gpsUtills.connectGoogleApiClient();
-
-            getCurrentLocation();
-        }
-    }
-
-    @Override
-    protected void onStop() {
-        gpsUtills.stopLocationUpdates();
-        super.onStop();
-    }
-
 //    @Override
 //    public void onCameraChange(CameraPosition cameraPosition) {
 //
@@ -422,8 +533,6 @@ public class LocationSearchActivity extends BaseActivity implements GPSCallback,
 
     @Override
     public void onCameraMoveStarted(int i) {
-//        mDragTimer.start();
-//        mTimerIsRunning = true;
     }
 
     @Override
@@ -435,11 +544,9 @@ public class LocationSearchActivity extends BaseActivity implements GPSCallback,
 
         currentLatLng = mMap.getCameraPosition().target;
         mZoom = mMap.getCameraPosition().zoom;
-        gpsUtills.isDeviceConfiguredProperly();
+        startIntentService();
+//        gpsUtills.isDeviceConfiguredProperly();
 
-//        if (mTimerIsRunning) {
-//            mDragTimer.cancel();
-//        }
     }
 
     @Override

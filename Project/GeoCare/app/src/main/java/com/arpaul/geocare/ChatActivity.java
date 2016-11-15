@@ -1,5 +1,6 @@
 package com.arpaul.geocare;
 
+import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
@@ -65,6 +66,7 @@ public class ChatActivity extends BaseActivity {
     }
 
     private void bindControls() {
+
         mUsername = ANONYMOUS;
         mFirebaseDatabase = FirebaseDatabase.getInstance();
         mFirebaseAuth = FirebaseAuth.getInstance();
@@ -113,38 +115,15 @@ public class ChatActivity extends BaseActivity {
             }
         });
 
-        mChildEventListener = new ChildEventListener() {
-            @Override
-            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                MessageDO objFriendlyMessage = dataSnapshot.getValue(MessageDO.class);
-                arrMessage.add(objFriendlyMessage);
-                adapter.refresh(arrMessage);
-            }
-
-            @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-            }
-
-            @Override
-            public void onChildRemoved(DataSnapshot dataSnapshot) {
-            }
-
-            @Override
-            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-            }
-        };
-        mMessageDtabaseRef.addChildEventListener(mChildEventListener);
         mAuthStateListener = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
                 FirebaseUser user = firebaseAuth.getCurrentUser();
                 if(user != null) {
                     Toast.makeText(ChatActivity.this, "You are logged in", Toast.LENGTH_LONG).show();
+                    signedInitialize(user.getDisplayName());
                 } else {
+                    signedOutCleanup();
                     startActivityForResult(
                             AuthUI.getInstance()
                                     .createSignInIntentBuilder()
@@ -157,6 +136,81 @@ public class ChatActivity extends BaseActivity {
                 }
             }
         };
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mFirebaseAuth.addAuthStateListener(mAuthStateListener);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        mFirebaseAuth.removeAuthStateListener(mAuthStateListener);
+        dettachReadListener();
+        adapter.refresh(new ArrayList<MessageDO>());
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(requestCode == RC_SIGN_IN) {
+            if(resultCode == RESULT_OK) {
+                Toast.makeText(ChatActivity.this, "Signed In!", Toast.LENGTH_LONG).show();
+            } else {
+                Toast.makeText(ChatActivity.this, "Signed In canceled", Toast.LENGTH_LONG).show();
+                finish();
+            }
+        }
+    }
+
+    private void signedInitialize(String userName) {
+        mUsername = userName;
+        attachReadListener();
+    }
+
+    private void signedOutCleanup() {
+        mUsername = ANONYMOUS;
+        adapter.refresh(new ArrayList<MessageDO>());
+        dettachReadListener();
+    }
+
+    private void attachReadListener() {
+        if(mChildEventListener == null) {
+            mChildEventListener = new ChildEventListener() {
+                @Override
+                public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                    MessageDO objFriendlyMessage = dataSnapshot.getValue(MessageDO.class);
+                    arrMessage.add(objFriendlyMessage);
+                    adapter.refresh(arrMessage);
+                }
+
+                @Override
+                public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+                }
+
+                @Override
+                public void onChildRemoved(DataSnapshot dataSnapshot) {
+                }
+
+                @Override
+                public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                }
+            };
+            mMessageDtabaseRef.addChildEventListener(mChildEventListener);
+        }
+    }
+
+    private void dettachReadListener() {
+        if(mChildEventListener != null) {
+            mMessageDtabaseRef.removeEventListener(mChildEventListener);
+            mChildEventListener = null;
+        }
     }
 
     private void initialiseControls() {
