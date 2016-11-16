@@ -53,6 +53,8 @@ public class ChatActivity extends BaseActivity {
     private FirebaseAuth mFirebaseAuth;
     private FirebaseAuth.AuthStateListener mAuthStateListener;
     public static final String ANONYMOUS = "anonymous";
+    public static final String MESSAGES_CHILD = "messages";
+    private static final String MESSAGE_SENT_EVENT = "message_sent";
     //https://classroom.udacity.com/courses/ud0352/lessons/daa58d76-0146-4c52-b5d8-45e32a3dfb08/concepts/d053c636-9d48-43a6-ba05-5db4781dc562
 
     @Override
@@ -108,10 +110,13 @@ public class ChatActivity extends BaseActivity {
         btnSend.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // Clear input box
-                edtMessage.setText("");
 
                 MessageDO friendlyMessage = new MessageDO(mUsername, edtMessage.getText().toString());
+                mMessageDtabaseRef.child(MESSAGES_CHILD).push().setValue(friendlyMessage);
+
+                // Clear input box
+                edtMessage.setText("");
+                mFirebaseAnalytics.logEvent(MESSAGE_SENT_EVENT, null);
             }
         });
 
@@ -129,8 +134,8 @@ public class ChatActivity extends BaseActivity {
                                     .createSignInIntentBuilder()
                                     .setIsSmartLockEnabled(false)
                                     .setProviders(Arrays.asList(
-                                            new AuthUI.IdpConfig.Builder(AuthUI.EMAIL_PROVIDER).build(),
-                                            new AuthUI.IdpConfig.Builder(AuthUI.GOOGLE_PROVIDER).build()))
+                                            new AuthUI.IdpConfig.Builder(AuthUI.EMAIL_PROVIDER).build()/*,
+                                            new AuthUI.IdpConfig.Builder(AuthUI.GOOGLE_PROVIDER).build()*/))
                                     .build(),
                             RC_SIGN_IN);
                 }
@@ -224,3 +229,14 @@ public class ChatActivity extends BaseActivity {
         rvChat.setAdapter(adapter);
     }
 }
+
+
+/*
+Real Time database
+{
+  "rules": {
+    ".read": "auth != null",
+    ".write": "auth != null"
+  }
+}
+* */
