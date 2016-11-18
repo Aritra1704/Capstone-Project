@@ -36,6 +36,8 @@ public class AppConstant {
 
     public static final long LOCATION_UPDATES_IN_SECONDS = 60;
 
+    public static final long DETECTION_INTERVAL_IN_MILLISECONDS = 0;
+
     public static final String ACTION_REFRESH      = "ACTION_REFRESH";
     public static final String EXTERNAL_FOLDER     = "/GeoCare/";
     public static final String EXTERNAL_FILENAME   = "GeoCare.txt";
