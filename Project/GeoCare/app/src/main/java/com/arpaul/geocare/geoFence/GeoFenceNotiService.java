@@ -66,7 +66,6 @@ public class GeoFenceNotiService extends Service implements GoogleApiClient.Conn
     protected synchronized void buildGoogleApiClient() {
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .addApi(LocationServices.API)
-                .addApi(ActivityRecognition.API)
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
                 .build();
@@ -151,20 +150,6 @@ public class GeoFenceNotiService extends Service implements GoogleApiClient.Conn
         } catch (SecurityException securityException) {
             // Catch exception generated if the app does not use ACCESS_FINE_LOCATION permission.
         }
-
-        ActivityRecognition.ActivityRecognitionApi.requestActivityUpdates(
-                mGoogleApiClient,
-                AppConstant.DETECTION_INTERVAL_IN_MILLISECONDS,
-                getActivityDetectionPendingIntent()
-        ).setResultCallback(this);
-    }
-
-    private PendingIntent getActivityDetectionPendingIntent() {
-        Intent intent = new Intent(this, DetectedIntentService.class);
-
-        // We use FLAG_UPDATE_CURRENT so that we get the same pending intent back when calling
-        // requestActivityUpdates() and removeActivityUpdates().
-        return PendingIntent.getService(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
     }
 
     private PendingIntent getGeofencePendingIntent() {

@@ -10,6 +10,7 @@ import android.widget.TextView;
 
 import com.arpaul.geocare.BaseActivity;
 import com.arpaul.geocare.R;
+import com.arpaul.geocare.dataObject.ActivityRecogDO;
 
 import java.util.ArrayList;
 
@@ -19,14 +20,14 @@ import java.util.ArrayList;
 public class TrackLocationTimeAdapter extends RecyclerView.Adapter<TrackLocationTimeAdapter.ViewHolder> {
 
     private Context context;
-    private ArrayList<String> arrTimes = new ArrayList<>();
+    private ArrayList<ActivityRecogDO> arrTimes = new ArrayList<>();
 
-    public TrackLocationTimeAdapter(Context context, ArrayList<String> arrTimes) {
+    public TrackLocationTimeAdapter(Context context, ArrayList<ActivityRecogDO> arrTimes) {
         this.context = context;
         this.arrTimes = arrTimes;
     }
 
-    public void refresh(ArrayList<String> arrTimes) {
+    public void refresh(ArrayList<ActivityRecogDO> arrTimes) {
         this.arrTimes = arrTimes;
         notifyDataSetChanged();
     }
@@ -39,12 +40,11 @@ public class TrackLocationTimeAdapter extends RecyclerView.Adapter<TrackLocation
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        final String strTime = arrTimes.get(position);
+        final ActivityRecogDO strTime = arrTimes.get(position);
 
-        String event[] = strTime.split("]");
-
-        holder.tvTourEvent.setText(event[0]);
-        holder.tvTourTime.setText(event[1]);
+        holder.tvTourEvent.setText(strTime.Event);
+        holder.tvTourTime.setText(strTime.OccuranceTime);
+        holder.tvActiRecog.setText(strTime.CurrentActivity);
 
         ((BaseActivity)context).applyTypeface(((BaseActivity)context).getParentView(holder.mView),((BaseActivity)context).tfRegular, Typeface.NORMAL);
     }
@@ -61,12 +61,14 @@ public class TrackLocationTimeAdapter extends RecyclerView.Adapter<TrackLocation
         public final View mView;
         public final TextView tvTourTime;
         public final TextView tvTourEvent;
+        public final TextView tvActiRecog;
 
         public ViewHolder(View view) {
             super(view);
             mView = view;
             tvTourTime      = (TextView) view.findViewById(R.id.tvTourTime);
             tvTourEvent     = (TextView) view.findViewById(R.id.tvTourEvent);
+            tvActiRecog     = (TextView) view.findViewById(R.id.tvActiRecog);
         }
 
         @Override

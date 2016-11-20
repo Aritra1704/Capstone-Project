@@ -12,6 +12,7 @@ import android.widget.Toast;
 import com.arpaul.geocare.BaseActivity;
 import com.arpaul.geocare.R;
 import com.arpaul.geocare.common.AppConstant;
+import com.arpaul.geocare.dataObject.ActivityRecogDO;
 import com.arpaul.geocare.dataObject.GeoFenceLocationDO;
 import com.arpaul.utilitieslib.CalendarUtils;
 
@@ -32,7 +33,7 @@ public class TrackLocationsAdapter extends RecyclerView.Adapter<TrackLocationsAd
     public TrackLocationsAdapter(Context context, LinkedHashMap<String, GeoFenceLocationDO> hashGeoLocs) {
         this.context = context;
         this.hashGeoLocs = hashGeoLocs;
-        childAdapter = new TrackLocationTimeAdapter(context, new ArrayList<String>());
+        childAdapter = new TrackLocationTimeAdapter(context, new ArrayList<ActivityRecogDO>());
     }
 
     public void refresh(LinkedHashMap<String, GeoFenceLocationDO> arrTours) {
@@ -52,9 +53,8 @@ public class TrackLocationsAdapter extends RecyclerView.Adapter<TrackLocationsAd
 
         holder.tvTourName.setText(objGeoFenceLocDO.LocationName);
 
-        String descrip = /*objGeoFenceLocDO.Event + " at " +*/
+        String descrip =
                 CalendarUtils.getDateinPattern(objGeoFenceLocDO.OccuranceDate, CalendarUtils.DATE_FORMAT1, CalendarUtils.DATE_FORMAT_WITH_COMMA);
-//                CalendarUtils.getDateinPattern(objGeoFenceLocDO.OccuranceTime, CalendarUtils.TIME_SEC_FORMAT, CalendarUtils.TIME_HOUR_MINUTE);
         holder.tvTourDesc.setText(descrip);
 
         if(AppConstant.trackClickPosition == position){

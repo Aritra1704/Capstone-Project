@@ -14,9 +14,11 @@ public class GCCPConstants {
 
     public static final String SAVED_LOCATION_TABLE_NAME        = "tblTagLocation";
     public static final String GEOFENCE_LOCATION_TABLE_NAME     = "tblGeoFenceLocation";
+    public static final String ACTI_RECOG_TABLE_NAME            = "tblActiRecog";
 
     public static final String AS_SAVED_LOCATION_TABLE          = " tSL";
     public static final String AS_GEOFENCE_LOCATION_TABLE       = " tGL";
+    public static final String AS_ACTI_RECOG_TABLE_TABLE        = " tAR";
 
     public static final int DATABASE_VERSION                   = 1;
 
@@ -53,31 +55,17 @@ public class GCCPConstants {
 
     public static final Uri CONTENT_URI_SAVED_LOC = Uri.parse(CONTENT + CONTENT_AUTHORITY + DELIMITER + SAVED_LOCATION_TABLE_NAME);
     public static final Uri CONTENT_URI_GEOFENCE_LOC = Uri.parse(CONTENT + CONTENT_AUTHORITY + DELIMITER + GEOFENCE_LOCATION_TABLE_NAME);
+    public static final Uri CONTENT_URI_ACTI_RECOG = Uri.parse(CONTENT + CONTENT_AUTHORITY + DELIMITER + ACTI_RECOG_TABLE_NAME);
 
     public static final Uri CONTENT_URI_RELATIONSHIP_JOIN = Uri.parse(CONTENT + CONTENT_AUTHORITY + DELIMITER + PATH_RELATIONSHIP_JOIN);
 
     public static final String PROVIDER_NAME = CONTENT_AUTHORITY;
 
     // create cursor of base type directory for multiple entries
-    public static final String CONTENT_USERNAME_TYPE =
+    public static final String CONTENT_MULTIPLE_TYPE =
             ContentResolver.CURSOR_DIR_BASE_TYPE + DELIMITER + CONTENT_AUTHORITY + DELIMITER + DATABASE_NAME;
     // create cursor of base type item for single entry
-    public static final String CONTENT_USERID_TYPE =
-            ContentResolver.CURSOR_ITEM_BASE_TYPE + DELIMITER + CONTENT_AUTHORITY + DELIMITER + DATABASE_NAME;
-
-    public static final String CONTENT_FARMID_TYPE =
-            ContentResolver.CURSOR_ITEM_BASE_TYPE + DELIMITER + CONTENT_AUTHORITY + DELIMITER + DATABASE_NAME;
-
-    public static final String CONTENT_FARMNAME_TYPE =
-            ContentResolver.CURSOR_ITEM_BASE_TYPE + DELIMITER + CONTENT_AUTHORITY + DELIMITER + DATABASE_NAME;
-
-    public static final String CONTENT_SYNCLOG_TYPE =
-            ContentResolver.CURSOR_ITEM_BASE_TYPE + DELIMITER + CONTENT_AUTHORITY + DELIMITER + DATABASE_NAME;
-
-    public static final String CONTENT_SPECIALEVENT_TYPE =
-            ContentResolver.CURSOR_ITEM_BASE_TYPE + DELIMITER + CONTENT_AUTHORITY + DELIMITER + DATABASE_NAME;
-
-    public static final String CONTENT_IMAGE_TYPE =
+    public static final String CONTENT_BASE_TYPE =
             ContentResolver.CURSOR_ITEM_BASE_TYPE + DELIMITER + CONTENT_AUTHORITY + DELIMITER + DATABASE_NAME;
 
     public static Uri buildLocationUri(long id){

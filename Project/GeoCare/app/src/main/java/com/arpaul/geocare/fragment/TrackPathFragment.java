@@ -1,8 +1,10 @@
 package com.arpaul.geocare.fragment;
 
+import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteQueryBuilder;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
@@ -22,6 +24,7 @@ import com.arpaul.geocare.adapter.TrackLocationsAdapter;
 import com.arpaul.geocare.common.AppConstant;
 import com.arpaul.geocare.common.ApplicationInstance;
 import com.arpaul.geocare.dataAccess.GCCPConstants;
+import com.arpaul.geocare.dataObject.ActivityRecogDO;
 import com.arpaul.geocare.dataObject.GeoFenceLocationDO;
 import com.arpaul.utilitieslib.CalendarUtils;
 import com.arpaul.utilitieslib.LogUtils;
@@ -84,6 +87,18 @@ public class TrackPathFragment extends Fragment implements LoaderManager.LoaderC
         else
             loadData();
 
+
+
+//        ContentValues cValues = new ContentValues();
+//        cValues.put(ActivityRecogDO.LOCATIONID, 251);
+//        cValues.put(ActivityRecogDO.LOCATIONNAME, "Test");
+//        cValues.put(ActivityRecogDO.EVENT, "Test event");
+//        cValues.put(ActivityRecogDO.OCCURANCEDATE, "20-11-2016");
+//        cValues.put(ActivityRecogDO.OCCURANCETIME, "05:53");
+//        cValues.put(ActivityRecogDO.CURRENT_ACTIVITY, "Sleep");
+//
+//        Uri uri = getActivity().getContentResolver().insert(GCCPConstants.CONTENT_URI_ACTI_RECOG, cValues);
+
     }
 
     @Override
@@ -91,19 +106,40 @@ public class TrackPathFragment extends Fragment implements LoaderManager.LoaderC
         switch (id){
             case ApplicationInstance.LOADER_FETCH_TRACK_LOCATION :
 
-//                SQLiteQueryBuilder queryBuilder = new SQLiteQueryBuilder();
-//
-//                queryBuilder.setTables(
-//                        GCCPConstants.GEOFENCE_LOCATION_TABLE_NAME + GCCPConstants.TABLE_GROUP_BY + GeoFenceLocationDO.OCCURANCEDATE);
+                SQLiteQueryBuilder queryBuilder = new SQLiteQueryBuilder();
+
+                queryBuilder.setTables(
+                        GCCPConstants.GEOFENCE_LOCATION_TABLE_NAME + GCCPConstants.AS_GEOFENCE_LOCATION_TABLE +
+                        GCCPConstants.TABLE_LEFT_OUTER_JOIN +
+                        GCCPConstants.ACTI_RECOG_TABLE_NAME + GCCPConstants.AS_ACTI_RECOG_TABLE_TABLE +
+                        GCCPConstants.TABLE_ON +
+                        //based on location id
+                        GCCPConstants.AS_GEOFENCE_LOCATION_TABLE + GCCPConstants.TABLE_DOT + GeoFenceLocationDO.LOCATIONID + GCCPConstants.TABLE_EQUAL +
+                        GCCPConstants.AS_ACTI_RECOG_TABLE_TABLE + GCCPConstants.TABLE_DOT + ActivityRecogDO.LOCATIONID + GCCPConstants.TABLE_AND +
+                        //based on occurance date
+                        GCCPConstants.AS_GEOFENCE_LOCATION_TABLE + GCCPConstants.TABLE_DOT + GeoFenceLocationDO.OCCURANCEDATE + GCCPConstants.TABLE_EQUAL +
+                        GCCPConstants.AS_ACTI_RECOG_TABLE_TABLE + GCCPConstants.TABLE_DOT + ActivityRecogDO.OCCURANCEDATE + GCCPConstants.TABLE_AND +
+                        //based on occurance time
+                        GCCPConstants.AS_GEOFENCE_LOCATION_TABLE + GCCPConstants.TABLE_DOT + GeoFenceLocationDO.OCCURANCETIME + GCCPConstants.TABLE_EQUAL +
+                        GCCPConstants.AS_ACTI_RECOG_TABLE_TABLE + GCCPConstants.TABLE_DOT + ActivityRecogDO.OCCURANCETIME +
+
+                        GCCPConstants.TABLE_ORDER_BY +
+                        GCCPConstants.AS_GEOFENCE_LOCATION_TABLE + GCCPConstants.TABLE_DOT + GeoFenceLocationDO.OCCURANCEDATE +
+                        GCCPConstants.TABLE_DESC);
 
 //                LogUtils.infoLog("QUERY_FARM_LIST", queryBuilder.getTables());
 
-                return new CursorLoader(getActivity(), GCCPConstants.CONTENT_URI_GEOFENCE_LOC,
-                        new String[]{GeoFenceLocationDO.LOCATIONID, GeoFenceLocationDO.LOCATIONNAME, GeoFenceLocationDO.EVENT,
-                                GeoFenceLocationDO.OCCURANCEDATE, GeoFenceLocationDO.OCCURANCETIME},
-                        null/*queryBuilder.getTables()*//*GeoFenceLocationDO.OCCURANCEDATE + GCCPConstants.TABLE_QUES*/,
+                return new CursorLoader(getActivity(), GCCPConstants.CONTENT_URI_RELATIONSHIP_JOIN,
+                        new String[]{GCCPConstants.AS_GEOFENCE_LOCATION_TABLE + GCCPConstants.TABLE_DOT + GeoFenceLocationDO.LOCATIONID,
+                                GCCPConstants.AS_GEOFENCE_LOCATION_TABLE + GCCPConstants.TABLE_DOT + GeoFenceLocationDO.LOCATIONNAME,
+                                GCCPConstants.AS_GEOFENCE_LOCATION_TABLE + GCCPConstants.TABLE_DOT + GeoFenceLocationDO.EVENT,
+                                GCCPConstants.AS_GEOFENCE_LOCATION_TABLE + GCCPConstants.TABLE_DOT + GeoFenceLocationDO.OCCURANCEDATE,
+                                GCCPConstants.AS_GEOFENCE_LOCATION_TABLE + GCCPConstants.TABLE_DOT + GeoFenceLocationDO.OCCURANCETIME,
+
+                                GCCPConstants.AS_ACTI_RECOG_TABLE_TABLE + GCCPConstants.TABLE_DOT + ActivityRecogDO.CURRENT_ACTIVITY},
+                        /*null*/queryBuilder.getTables()/*GeoFenceLocationDO.OCCURANCEDATE + GCCPConstants.TABLE_QUES*/,
                         null/*new String[]{CalendarUtils.getDateinPattern(CalendarUtils.DATE_FORMAT1)}*/,
-                        GeoFenceLocationDO.OCCURANCEDATE + GCCPConstants.TABLE_DESC);
+                        null/*GeoFenceLocationDO.OCCURANCEDATE + GCCPConstants.TABLE_DESC*/);
             default:
                 return null;
         }
@@ -120,11 +156,13 @@ public class TrackPathFragment extends Fragment implements LoaderManager.LoaderC
                         hashGeoFenceLocationDO.clear();
                         do {
 
-                            int locationId = StringUtils.getInt(cursor.getString(cursor.getColumnIndex(GeoFenceLocationDO.LOCATIONID)));
-                            String locationName = cursor.getString(cursor.getColumnIndex(GeoFenceLocationDO.LOCATIONNAME));
-                            String event = cursor.getString(cursor.getColumnIndex(GeoFenceLocationDO.EVENT));
-                            String occuranceDate = cursor.getString(cursor.getColumnIndex(GeoFenceLocationDO.OCCURANCEDATE));
-                            String occuranceTime = cursor.getString(cursor.getColumnIndex(GeoFenceLocationDO.OCCURANCETIME));
+                            int locationId = StringUtils.getInt(cursor.getString(cursor.getColumnIndex(GCCPConstants.AS_GEOFENCE_LOCATION_TABLE + GCCPConstants.TABLE_DOT + GeoFenceLocationDO.LOCATIONID)));
+                            String locationName = cursor.getString(cursor.getColumnIndex(GCCPConstants.AS_GEOFENCE_LOCATION_TABLE + GCCPConstants.TABLE_DOT + GeoFenceLocationDO.LOCATIONNAME));
+                            String event = cursor.getString(cursor.getColumnIndex(GCCPConstants.AS_GEOFENCE_LOCATION_TABLE + GCCPConstants.TABLE_DOT + GeoFenceLocationDO.EVENT));
+                            String occuranceDate = cursor.getString(cursor.getColumnIndex(GCCPConstants.AS_GEOFENCE_LOCATION_TABLE + GCCPConstants.TABLE_DOT + GeoFenceLocationDO.OCCURANCEDATE));
+                            String occuranceTime = cursor.getString(cursor.getColumnIndex(GCCPConstants.AS_GEOFENCE_LOCATION_TABLE + GCCPConstants.TABLE_DOT + GeoFenceLocationDO.OCCURANCETIME));
+
+                            String currentActivity = cursor.getString(cursor.getColumnIndex(GCCPConstants.AS_ACTI_RECOG_TABLE_TABLE + GCCPConstants.TABLE_DOT + ActivityRecogDO.CURRENT_ACTIVITY));
 
                             objGeoFenceLocationDO = hashGeoFenceLocationDO.get(locationName+"]"+occuranceDate);
                             if(objGeoFenceLocationDO == null) {
@@ -136,11 +174,26 @@ public class TrackPathFragment extends Fragment implements LoaderManager.LoaderC
                                 objGeoFenceLocationDO.OccuranceDate = occuranceDate;
                                 objGeoFenceLocationDO.OccuranceTime = occuranceTime;
 
-                                objGeoFenceLocationDO.arrTimings.add(event + "]" + occuranceTime);
+
+                                ActivityRecogDO objActiRecogDO = new ActivityRecogDO();
+                                objActiRecogDO.LocationId = locationId;
+                                objActiRecogDO.LocationName = locationName;
+                                objActiRecogDO.Event = event;
+                                objActiRecogDO.OccuranceDate = occuranceDate;
+                                objActiRecogDO.OccuranceTime = occuranceTime;
+                                objActiRecogDO.CurrentActivity = currentActivity;
+                                objGeoFenceLocationDO.arrTimings.add(objActiRecogDO);
 
                                 hashGeoFenceLocationDO.put(locationName+"]"+occuranceDate, objGeoFenceLocationDO);
                             } else {
-                                objGeoFenceLocationDO.arrTimings.add(event + "]" + occuranceTime);
+                                ActivityRecogDO objActiRecogDO = new ActivityRecogDO();
+                                objActiRecogDO.LocationId = locationId;
+                                objActiRecogDO.LocationName = locationName;
+                                objActiRecogDO.Event = event;
+                                objActiRecogDO.OccuranceDate = occuranceDate;
+                                objActiRecogDO.OccuranceTime = occuranceTime;
+                                objActiRecogDO.CurrentActivity = currentActivity;
+                                objGeoFenceLocationDO.arrTimings.add(objActiRecogDO);
                             }
 //                            hashGeoFenceLocationDO.add(objGeoFenceLocationDO);
                         } while (cursor.moveToNext());

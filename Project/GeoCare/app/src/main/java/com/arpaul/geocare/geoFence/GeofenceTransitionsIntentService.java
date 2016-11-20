@@ -18,8 +18,10 @@ import android.util.Log;
 
 import com.arpaul.geocare.GeoFenceActivity;
 import com.arpaul.geocare.R;
+import com.arpaul.geocare.activityRecognition.ActivityRecogNotiService;
 import com.arpaul.geocare.common.AppConstant;
 import com.arpaul.geocare.dataAccess.GCCPConstants;
+import com.arpaul.geocare.dataObject.ActivityRecogDO;
 import com.arpaul.geocare.dataObject.GeoFenceLocationDO;
 import com.arpaul.geocare.dataObject.PrefLocationDO;
 import com.arpaul.utilitieslib.CalendarUtils;
@@ -111,7 +113,7 @@ public class GeofenceTransitionsIntentService extends IntentService {
     private void trackPositions(String triggeringGeofences) {
         String[] geofenceEvent = triggeringGeofences.split("]");
 
-        AppConstant.writeFile("\n" + triggeringGeofences + " Date: " + CalendarUtils.getDateinPattern(CalendarUtils.DATE_TIME_FORMAT_T));
+        AppConstant.writeFile("\nGeofence: " + triggeringGeofences + " Date: " + CalendarUtils.getDateinPattern(CalendarUtils.DATE_TIME_FORMAT_T));
 
         if(geofenceEvent != null && geofenceEvent.length > 0) {
 
@@ -139,6 +141,14 @@ public class GeofenceTransitionsIntentService extends IntentService {
 
                 Uri uri = getContentResolver().insert(GCCPConstants.CONTENT_URI_GEOFENCE_LOC, cValues);
                 cursor.close();
+
+                Intent intent = new Intent(getApplicationContext(), ActivityRecogNotiService.class);
+                intent.putExtra(ActivityRecogDO.LOCATIONID, objPrefLocationDO.LocationId);
+                intent.putExtra(ActivityRecogDO.LOCATIONNAME, geofenceEvent[1]);
+                intent.putExtra(ActivityRecogDO.EVENT, geofenceEvent[0]);
+                intent.putExtra(ActivityRecogDO.OCCURANCEDATE, CalendarUtils.getDateinPattern(CalendarUtils.DATE_FORMAT1));
+                intent.putExtra(ActivityRecogDO.OCCURANCETIME, CalendarUtils.getDateinPattern(CalendarUtils.TIME_SEC_FORMAT));
+                startService(intent);
             }
         }
     }

@@ -28,6 +28,7 @@ public class ContentProviderHelper extends ContentProvider {
     public static final int USERNAME                                = 1;
     public static final int USER_ID                                 = 2;
     public static final int GEOFENCE_LOC                            = 3;
+    public static final int ACTI_RECOG                              = 4;
     public static final int PREF_LOC_NAME                           = 7;
     public static final int SYNCLOG                                 = 16;
     public static final int IMAGES                                  = 18;
@@ -42,8 +43,9 @@ public class ContentProviderHelper extends ContentProvider {
     static {
         uriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
         uriMatcher.addURI(GCCPConstants.PROVIDER_NAME, GCCPConstants.SAVED_LOCATION_TABLE_NAME, PREF_LOC_NAME);
-        uriMatcher.addURI(GCCPConstants.PROVIDER_NAME, GCCPConstants.PATH_RELATIONSHIP_JOIN, RELATIONSHIP_JOIN);
         uriMatcher.addURI(GCCPConstants.PROVIDER_NAME, GCCPConstants.GEOFENCE_LOCATION_TABLE_NAME, GEOFENCE_LOC);
+        uriMatcher.addURI(GCCPConstants.PROVIDER_NAME, GCCPConstants.ACTI_RECOG_TABLE_NAME, ACTI_RECOG);
+        uriMatcher.addURI(GCCPConstants.PROVIDER_NAME, GCCPConstants.PATH_RELATIONSHIP_JOIN, RELATIONSHIP_JOIN);
     }
 
     private DataBaseHelper mOpenHelper;
@@ -135,6 +137,9 @@ public class ContentProviderHelper extends ContentProvider {
                 case GEOFENCE_LOC:
                     table = GCCPConstants.GEOFENCE_LOCATION_TABLE_NAME;
                     break;
+                case ACTI_RECOG:
+                    table = GCCPConstants.ACTI_RECOG_TABLE_NAME;
+                    break;
                 case RELATIONSHIP_JOIN:
                     table = selection;
                     selection = null;
@@ -207,6 +212,9 @@ public class ContentProviderHelper extends ContentProvider {
             case GEOFENCE_LOC:
                 table = GCCPConstants.GEOFENCE_LOCATION_TABLE_NAME;
                 break;
+            case ACTI_RECOG:
+                table = GCCPConstants.ACTI_RECOG_TABLE_NAME;
+                break;
             default: {
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
             }
@@ -220,15 +228,19 @@ public class ContentProviderHelper extends ContentProvider {
         final int match = uriMatcher.match(uri);
         switch (match) {
             case USERNAME:
-                return GCCPConstants.CONTENT_USERNAME_TYPE;
+                return GCCPConstants.CONTENT_MULTIPLE_TYPE;
             case USER_ID:
-                return GCCPConstants.CONTENT_USERID_TYPE;
+                return GCCPConstants.CONTENT_BASE_TYPE;
+            case PREF_LOC_NAME:
+                return GCCPConstants.CONTENT_BASE_TYPE;
             case GEOFENCE_LOC:
-                return GCCPConstants.CONTENT_FARMID_TYPE;
+                return GCCPConstants.CONTENT_BASE_TYPE;
+            case ACTI_RECOG:
+                return GCCPConstants.CONTENT_BASE_TYPE;
             case SYNCLOG:
-                return GCCPConstants.CONTENT_SYNCLOG_TYPE;
+                return GCCPConstants.CONTENT_BASE_TYPE;
             case IMAGES:
-                return GCCPConstants.CONTENT_IMAGE_TYPE;
+                return GCCPConstants.CONTENT_BASE_TYPE;
             default: {
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
             }
