@@ -36,7 +36,7 @@ dependencies {
     compile 'com.android.support:support-v4:24.2.1'
     compile 'com.android.support:support-vector-drawable:24.2.1'
 
-    compile 'com.github.Aritra1704:UtilitiesJitPackLib:1.12'
+    compile 'com.github.Aritra1704:UtilitiesJitPackLib:1.13'
     compile 'com.github.Aritra1704:CustomAlerts:1.03'
     compile 'com.github.Aritra1704:LocationFinder:1.2'
     compile 'com.afollestad.material-dialogs:core:0.8.5.9'

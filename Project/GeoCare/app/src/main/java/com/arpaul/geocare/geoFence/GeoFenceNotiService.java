@@ -76,7 +76,7 @@ public class GeoFenceNotiService extends Service implements GoogleApiClient.Conn
 
         Cursor cursor = getContentResolver().query(GCCPConstants.CONTENT_URI_SAVED_LOC,
                 new String[]{PrefLocationDO.LOCATIONID, PrefLocationDO.LOCATIONNAME, PrefLocationDO.ADDRESS,
-                        PrefLocationDO.LATITUDE, PrefLocationDO.LONGITUDE},
+                        PrefLocationDO.LATITUDE, PrefLocationDO.LONGITUDE, PrefLocationDO.RADIUS},
                 null,
                 null,
                 null);
@@ -91,6 +91,7 @@ public class GeoFenceNotiService extends Service implements GoogleApiClient.Conn
                 objPrefLocationDO.Address = cursor.getString(cursor.getColumnIndex(PrefLocationDO.ADDRESS));
                 objPrefLocationDO.Latitude = StringUtils.getDouble(cursor.getString(cursor.getColumnIndex(PrefLocationDO.LATITUDE)));
                 objPrefLocationDO.Longitude = StringUtils.getDouble(cursor.getString(cursor.getColumnIndex(PrefLocationDO.LONGITUDE)));
+                objPrefLocationDO.Radius = StringUtils.getInt(cursor.getString(cursor.getColumnIndex(PrefLocationDO.RADIUS)));
 
                 arrPrefLocationDO.add(objPrefLocationDO);
             } while (cursor.moveToNext());
@@ -174,7 +175,7 @@ public class GeoFenceNotiService extends Service implements GoogleApiClient.Conn
                     .setCircularRegion(
                             objPrefLocationDO.Latitude,
                             objPrefLocationDO.Longitude,
-                            AppConstant.GEOFENCE_RADIUS_IN_METERS
+                            objPrefLocationDO.Radius
                     )
 
                     // Set the expiration duration of the geofence. This geofence gets automatically

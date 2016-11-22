@@ -80,6 +80,7 @@ public class InsertLoader extends AsyncTaskLoader {
                     contentValues.put(PrefLocationDO.ADDRESS, objPrefLocationDO.Address);
                     contentValues.put(PrefLocationDO.LATITUDE, objPrefLocationDO.Latitude);
                     contentValues.put(PrefLocationDO.LONGITUDE, objPrefLocationDO.Longitude);
+                    contentValues.put(PrefLocationDO.RADIUS, objPrefLocationDO.Radius);
 
                     String address = "";
                     int tryUpdate = context.getContentResolver().update(GCCPConstants.CONTENT_URI_SAVED_LOC,

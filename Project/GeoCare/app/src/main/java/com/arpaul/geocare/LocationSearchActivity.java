@@ -45,6 +45,7 @@ import com.arpaul.gpslibrary.fetchAddressGeoCode.FetchGeoCodeLoader;
 import com.arpaul.gpslibrary.fetchLocation.GPSErrorCode;
 import com.arpaul.utilitieslib.LogUtils;
 import com.arpaul.utilitieslib.PermissionUtils;
+import com.arpaul.utilitieslib.StringUtils;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
@@ -153,22 +154,15 @@ public class LocationSearchActivity extends BaseActivity implements
                 .addOnConnectionFailedListener(this)
                 .build();
 
-
-        LocationManager locationManager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
-        boolean isGpsProviderEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
-        if(!isGpsProviderEnabled) {
-            showCustomDialog(getString(R.string.gpssettings),getString(R.string.gps_not_enabled),getString(R.string.settings),getString(R.string.cancel),getString(R.string.settings), CustomPopupType.DIALOG_ALERT,false);
-        }
-
-        if(mGoogleApiClient != null)
-            mGoogleApiClient.connect();
-
         if(isGpsEnabled()) {
             isGpsEnabled = true;
         } else {
             isGpsEnabled = false;
             showCustomDialog(getString(R.string.gpssettings),getString(R.string.gps_not_enabled),getString(R.string.settings),getString(R.string.cancel),getString(R.string.settings), CustomPopupType.DIALOG_ALERT,false);
         }
+
+        if(mGoogleApiClient != null)
+            mGoogleApiClient.connect();
     }
 
     private void saveLocation(){
@@ -185,10 +179,18 @@ public class LocationSearchActivity extends BaseActivity implements
         View view = mdFilter.getCustomView();
 
         final EditText edtLocationName        = (EditText) view.findViewById(R.id.edtLocationName);
+        final EditText edtFenceRadius         = (EditText) view.findViewById(R.id.edtFenceRadius);
         TextView tvAddress                    = (TextView) view.findViewById(R.id.tvAddress);
+
+        edtFenceRadius.setText(AppConstant.GEOFENCE_RADIUS_IN_METERS + "");
 
         final String address = edtAddress.getText().toString();
         tvAddress.setText(address);
+
+        String radiusParam = edtFenceRadius.getText().toString();
+        if(TextUtils.isEmpty(radiusParam))
+            radiusParam = AppConstant.GEOFENCE_RADIUS_IN_METERS + "";
+        final int radius = (int) StringUtils.getFloat(radiusParam);
 
         edtLocationName.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
@@ -210,47 +212,46 @@ public class LocationSearchActivity extends BaseActivity implements
                         if(!TextUtils.isEmpty(edtLocationName.getText().toString())){
                             String locationName = edtLocationName.getText().toString();
 
-                            Uri CONTENT_URI = Uri.parse(GCCPConstants.CONTENT + GCCPConstants.CONTENT_AUTHORITY + GCCPConstants.DELIMITER +
-                                    GCCPConstants.SAVED_LOCATION_TABLE_NAME + GCCPConstants.DELIMITER);
+                            Uri CONTENT_URI = GCCPConstants.CONTENT_URI_SAVED_LOC;
+                            locationName = StringUtils.wordFirstCap(locationName).trim();
                             Cursor cursor = getContentResolver().query(CONTENT_URI,
-                                    new String[]{"MAX(" + PrefLocationDO.LOCATIONID + ") AS " + PrefLocationDO.MAXLOCATIONID},
-                                    null,
-                                    null,
+                                    new String[] {PrefLocationDO.LOCATIONID},
+                                    PrefLocationDO.LOCATIONNAME + GCCPConstants.TABLE_QUES,
+                                    new String[]{locationName},
                                     null);
 
-                            if (cursor != null && cursor.moveToFirst() && cursor.getCount() > 0)
-                                locationId = cursor.getInt(cursor.getColumnIndex(PrefLocationDO.MAXLOCATIONID)) + 1;
+                            if(cursor != null && cursor.moveToFirst()){
+                                cursor.close();
+                                showCustomDialog(getString(R.string.alert),getString(R.string.same_location_exists),getString(R.string.ok),null,getString(R.string.same_location_exists), CustomPopupType.DIALOG_ALERT,true);
+                            } else {
+                                cursor.close();
 
-                            PrefLocationDO objPrefLocationDO = new PrefLocationDO();
-                            objPrefLocationDO.LocationId = locationId;
-                            objPrefLocationDO.LocationName = locationName;
-                            objPrefLocationDO.Address = address;
-                            objPrefLocationDO.Latitude = currentLatLng.latitude;
-                            objPrefLocationDO.Longitude = currentLatLng.longitude;
+//                                Uri CONTENT_URI = Uri.parse(GCCPConstants.CONTENT + GCCPConstants.CONTENT_AUTHORITY + GCCPConstants.DELIMITER +
+//                                        GCCPConstants.SAVED_LOCATION_TABLE_NAME + GCCPConstants.DELIMITER);
+                                cursor = getContentResolver().query(CONTENT_URI,
+                                        new String[]{"MAX(" + PrefLocationDO.LOCATIONID + ") AS " + PrefLocationDO.MAXLOCATIONID},
+                                        null,
+                                        null,
+                                        null);
 
-                            Bundle bundle = new Bundle();
-                            bundle.putSerializable(InsertLoader.BUNDLE_INSERTLOADER,objPrefLocationDO);
+                                if (cursor != null && cursor.moveToFirst() && cursor.getCount() > 0)
+                                    locationId = cursor.getInt(cursor.getColumnIndex(PrefLocationDO.MAXLOCATIONID)) + 1;
 
-                            getSupportLoaderManager().initLoader(ApplicationInstance.LOADER_SAVE_LOCATION, bundle, LocationSearchActivity.this).forceLoad();
+                                PrefLocationDO objPrefLocationDO = new PrefLocationDO();
+                                objPrefLocationDO.LocationId = locationId;
+                                objPrefLocationDO.LocationName = locationName;
+                                objPrefLocationDO.Address = address;
+                                objPrefLocationDO.Latitude = currentLatLng.latitude;
+                                objPrefLocationDO.Longitude = currentLatLng.longitude;
+                                objPrefLocationDO.Radius = radius;
 
-                            /*if(uri != null){
-                                showCustomDialog(getString(R.string.success),getString(R.string.location_successfuly_added),null,null,getString(R.string.location_successfuly_added),false);
-                                new Handler().postDelayed(new Runnable() {
+                                Bundle bundle = new Bundle();
+                                bundle.putSerializable(InsertLoader.BUNDLE_INSERTLOADER,objPrefLocationDO);
 
-                                    @Override
-                                    public void run() {
-                                        hideCustomDialog();
-                                        dialog.dismiss();
+                                getSupportLoaderManager().initLoader(ApplicationInstance.LOADER_SAVE_LOCATION, bundle, LocationSearchActivity.this).forceLoad();
+                            }
+                            cursor.close();
 
-                                        preference.saveStringInPreference(AppPreference.PREF_LOC, ""+locationId);
-                                        Intent resultIntent = new Intent();
-                                        resultIntent.putExtra("address",address);
-                                        setResult(1001);
-
-                                        finish();
-                                    }
-                                }, HANDLER_TIME_OUT);
-                            }*/
                         }
                     }
                 });
@@ -260,6 +261,7 @@ public class LocationSearchActivity extends BaseActivity implements
                     @Override
                     public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
                         dialog.dismiss();
+                        mdFilter = null;
                     }
                 });
         try{
@@ -432,6 +434,7 @@ public class LocationSearchActivity extends BaseActivity implements
 
         Toast.makeText(LocationSearchActivity.this, "Lat: "+currentLatLng.latitude+" Lon: "+currentLatLng.longitude, Toast.LENGTH_SHORT).show();
         showCurrentLocation();
+        startIntentService();
     }
 
     private boolean isGpsEnabled(){

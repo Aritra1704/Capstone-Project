@@ -31,6 +31,7 @@ public class ActivityRecogNotiService extends Service implements GoogleApiClient
     private GoogleApiClient mGoogleApiClient;
     private String name, event, date, time;
     private int locationID;
+    private boolean clearActiNoti = false;
 
     @Nullable
     @Override
@@ -47,6 +48,9 @@ public class ActivityRecogNotiService extends Service implements GoogleApiClient
             event = intent.getExtras().getString(ActivityRecogDO.EVENT);
             date = intent.getExtras().getString(ActivityRecogDO.OCCURANCEDATE);
             time = intent.getExtras().getString(ActivityRecogDO.OCCURANCETIME);
+        } else if(intent.hasExtra(AppConstant.KEY_ACTIVITY_NOTI)) {
+            if(intent.getExtras().getString(AppConstant.KEY_ACTIVITY_NOTI).equalsIgnoreCase(AppConstant.VALUE_CLEAR))
+                clearActiNoti = true;
         }
         buildGoogleApiClient();
 
@@ -70,11 +74,18 @@ public class ActivityRecogNotiService extends Service implements GoogleApiClient
 
     @Override
     public void onConnected(@Nullable Bundle bundle) {
-        ActivityRecognition.ActivityRecognitionApi.requestActivityUpdates(
-                mGoogleApiClient,
-                AppConstant.DETECTION_INTERVAL_IN_MILLISECONDS,
-                getActivityDetectionPendingIntent()
-        ).setResultCallback(this);
+        if(!clearActiNoti) {
+            ActivityRecognition.ActivityRecognitionApi.requestActivityUpdates(
+                    mGoogleApiClient,
+                    AppConstant.DETECTION_INTERVAL_IN_MILLISECONDS,
+                    getActivityDetectionPendingIntent()
+            ).setResultCallback(this);
+        } else {
+            ActivityRecognition.ActivityRecognitionApi.removeActivityUpdates(
+                    mGoogleApiClient,
+                    getActivityDetectionPendingIntent()
+            ).setResultCallback(this);
+        }
     }
 
     @Override

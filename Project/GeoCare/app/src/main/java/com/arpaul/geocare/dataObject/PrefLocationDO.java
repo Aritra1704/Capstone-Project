@@ -9,6 +9,7 @@ public class PrefLocationDO extends BaseDO {
     public String Address               = "";
     public double Latitude              = 0.0;
     public double Longitude             = 0.0;
+    public int Radius                   = 0;
 
     public static final String LOCATIONID       = "LOCATIONID";
     public static final String MAXLOCATIONID    = "MAXLOCATIONID";
@@ -16,4 +17,5 @@ public class PrefLocationDO extends BaseDO {
     public static final String ADDRESS          = "ADDRESS";
     public static final String LATITUDE         = "LATITUDE";
     public static final String LONGITUDE        = "LONGITUDE";
+    public static final String RADIUS           = "RADIUS";
 }

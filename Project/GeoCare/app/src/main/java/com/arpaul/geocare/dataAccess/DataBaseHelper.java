@@ -27,7 +27,9 @@ public class DataBaseHelper extends SQLiteOpenHelper {
                     PrefLocationDO.LOCATIONNAME     + " VARCHAR NOT NULL, " +
                     PrefLocationDO.ADDRESS          + " VARCHAR NOT NULL, " +
                     PrefLocationDO.LATITUDE         + " DOUBLE NOT NULL, " +
-                    PrefLocationDO.LONGITUDE        + " DOUBLE NOT NULL);";
+                    PrefLocationDO.LONGITUDE        + " DOUBLE NOT NULL, " +
+                    PrefLocationDO.RADIUS           + " INTEGER NOT NULL " +
+                    ");";
 
     static final String CREATE_GEOFENCE_LOCATION_DB_TABLE =
             " CREATE TABLE IF NOT EXISTS " + GCCPConstants.GEOFENCE_LOCATION_TABLE_NAME +

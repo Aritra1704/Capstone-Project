@@ -36,12 +36,15 @@ public class AppConstant {
 
     public static final long LOCATION_UPDATES_IN_SECONDS = 60;
 
-    public static final long DETECTION_INTERVAL_IN_MILLISECONDS = 0;
+    public static final long DETECTION_INTERVAL_IN_MILLISECONDS = 1000;
 
     public static final String ACTION_REFRESH      = "ACTION_REFRESH";
     public static final String EXTERNAL_FOLDER     = "/GeoCare/";
     public static final String EXTERNAL_FILENAME   = "GeoCare.txt";
-    public static FirebaseAuth mFirebaseAuth;;
+    public static FirebaseAuth mFirebaseAuth;
+
+    public static final String KEY_ACTIVITY_NOTI        = "KEY_ACTIVITY_NOTI";
+    public static final String VALUE_CLEAR              = "CLEAR";
 
     public static int trackClickPosition = -1;
     public static int REQUEST_INVITE = 1501;

@@ -21,9 +21,11 @@
     <string name="location_successfuly_added">Your location successfully added.</string>
     <string name="please_enter_proper_address">Please enter proper address</string>
     <string name="please_enter_location_name">Please enter location name.</string>
+    <string name="fence_radius">Fence radius: </string>
     <string name="address_b"><b>Address: </b></string>
     <string name="location">Location</string>
     <string name="location_address_empty">Location address is empty.</string>
+    <string name="same_location_exists">Location with same name already exists.</string>
 
     <!-- Transition type strings -->
     <string name="geofence_transition_entered">Entered</string>

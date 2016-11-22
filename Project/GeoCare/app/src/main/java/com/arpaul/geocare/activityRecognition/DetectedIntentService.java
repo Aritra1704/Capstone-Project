@@ -55,21 +55,32 @@ public class DetectedIntentService extends IntentService {
         ArrayList<DetectedActivity> detectedActivities = (ArrayList) result.getProbableActivities();
 
         String actiRecog = "";
+        StringBuilder stringBuilder = new StringBuilder();
         int choice = 2;
         for(DetectedActivity thisActivity: detectedActivities){
             if(thisActivity.getConfidence() >= 50 &&
                     !getActivityString(thisActivity.getType()).equalsIgnoreCase(resources.getString(R.string.unknown))) {
-                actiRecog =  getActivityString(thisActivity.getType()) + ": " + thisActivity.getConfidence() + "%\n";
+//                actiRecog =  getActivityString(thisActivity.getType())/* + ": " + thisActivity.getConfidence() + "%\n"*/;
+                stringBuilder.append(getActivityString(thisActivity.getType()));
                 break;
             } else if(thisActivity.getConfidence() < 50 &&
                     !getActivityString(thisActivity.getType()).equalsIgnoreCase(resources.getString(R.string.unknown)) &&
                     choice > 0) {
-                actiRecog +=  getActivityString(thisActivity.getType()) + ": " + thisActivity.getConfidence() + "%\n";
+//                actiRecog +=  getActivityString(thisActivity.getType())/* + thisActivity.getConfidence() + "%\n"*/;
+                stringBuilder.append(getActivityString(thisActivity.getType()));
                 choice--;
+                if(choice > 0) {
+//                    actiRecog +=  " or ";
+                    stringBuilder.append(" or ");
+                }
             }
         }
+        actiRecog = stringBuilder.toString();
         // Log each activity.
         LogUtils.infoLog(TAG, actiRecog);
+
+        date = CalendarUtils.getDateinPattern(CalendarUtils.DATE_FORMAT1);
+        time = CalendarUtils.getDateinPattern(CalendarUtils.TIME_SEC_FORMAT);
 
         ContentValues cValues = new ContentValues();
         cValues.put(ActivityRecogDO.LOCATIONID, locationID);
@@ -79,14 +90,32 @@ public class DetectedIntentService extends IntentService {
         cValues.put(ActivityRecogDO.OCCURANCETIME, time);
         cValues.put(ActivityRecogDO.CURRENT_ACTIVITY, actiRecog);
 
-        AppConstant.writeFile("\nInsert: locationID: " + locationID +
-                " name: " + name +
-                " event: " + event +
-                " date: " + date +
-                " time: " + time +
-                " actiRecog: " + actiRecog);
+        int update = getContentResolver().update(GCCPConstants.CONTENT_URI_ACTI_RECOG,
+                cValues,
+                ActivityRecogDO.LOCATIONNAME + GCCPConstants.TABLE_QUES + GCCPConstants.TABLE_AND +
+                ActivityRecogDO.EVENT + GCCPConstants.TABLE_QUES + GCCPConstants.TABLE_AND +
+                ActivityRecogDO.OCCURANCEDATE + GCCPConstants.TABLE_QUES + GCCPConstants.TABLE_AND +
+                ActivityRecogDO.OCCURANCETIME + GCCPConstants.TABLE_QUES,
+                new String[]{name, event, date, time});
 
-        Uri uri = getContentResolver().insert(GCCPConstants.CONTENT_URI_ACTI_RECOG, cValues);
+        if(update < 1) {
+            AppConstant.writeFile("\nInsert: locationID: " + locationID +
+                    " name: " + name +
+                    " event: " + event +
+                    " date: " + date +
+                    " time: " + time +
+                    " actiRecog: " + actiRecog);
+
+            Uri uri = getContentResolver().insert(GCCPConstants.CONTENT_URI_ACTI_RECOG, cValues);
+            removeActivityUpdates();
+        } else {
+            AppConstant.writeFile("\nUpdate: locationID: " + locationID +
+                    " name: " + name +
+                    " event: " + event +
+                    " date: " + date +
+                    " time: " + time +
+                    " actiRecog: " + actiRecog);
+        }
 
         // Broadcast the list of detected activities.
 //        localIntent.putExtra(AppConstant.ACTIVITY_EXTRA, detectedActivities);
@@ -117,5 +146,11 @@ public class DetectedIntentService extends IntentService {
             default:
                 return resources.getString(R.string.unidentifiable_activity, detectedActivityType);
         }
+    }
+
+    private void removeActivityUpdates() {
+        Intent intent = new Intent(getApplicationContext(), ActivityRecogNotiService.class);
+        intent.putExtra(AppConstant.KEY_ACTIVITY_NOTI, AppConstant.VALUE_CLEAR);
+        startService(intent);
     }
 }

@@ -152,7 +152,7 @@ public class GeofenceTransitionsIntentService extends IntentService {
                         GeoFenceLocationDO.OCCURANCEDATE + GCCPConstants.TABLE_QUES + GCCPConstants.TABLE_AND +
                         GeoFenceLocationDO.OCCURANCETIME + GCCPConstants.TABLE_QUES,
                         new String[]{locationname, event, date, time});
-                if(update <= 0) {
+                if(update < 1) {
                     uri = getContentResolver().insert(GCCPConstants.CONTENT_URI_GEOFENCE_LOC, cValues);
 
                     Intent intent = new Intent(getApplicationContext(), ActivityRecogNotiService.class);
