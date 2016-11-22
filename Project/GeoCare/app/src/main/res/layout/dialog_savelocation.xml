@@ -39,6 +39,7 @@
             android:imeOptions="actionDone"
             android:inputType="number"
             android:maxLength="3"
+            android:text="25"
             android:textSize="@dimen/textsize_14"/>
     </LinearLayout>
 

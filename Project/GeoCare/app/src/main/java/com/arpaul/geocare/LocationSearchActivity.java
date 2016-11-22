@@ -175,6 +175,7 @@ public class LocationSearchActivity extends BaseActivity implements
 
         if(mdFilter == null)
             mdFilter =  builder.build();
+        final LatLng saveLatLng = currentLatLng;
 
         View view = mdFilter.getCustomView();
 
@@ -182,7 +183,7 @@ public class LocationSearchActivity extends BaseActivity implements
         final EditText edtFenceRadius         = (EditText) view.findViewById(R.id.edtFenceRadius);
         TextView tvAddress                    = (TextView) view.findViewById(R.id.tvAddress);
 
-        edtFenceRadius.setText(AppConstant.GEOFENCE_RADIUS_IN_METERS + "");
+//        edtFenceRadius.setText(String.valueOf(AppConstant.GEOFENCE_RADIUS_IN_METERS));
 
         final String address = edtAddress.getText().toString();
         tvAddress.setText(address);
@@ -226,8 +227,6 @@ public class LocationSearchActivity extends BaseActivity implements
                             } else {
                                 cursor.close();
 
-//                                Uri CONTENT_URI = Uri.parse(GCCPConstants.CONTENT + GCCPConstants.CONTENT_AUTHORITY + GCCPConstants.DELIMITER +
-//                                        GCCPConstants.SAVED_LOCATION_TABLE_NAME + GCCPConstants.DELIMITER);
                                 cursor = getContentResolver().query(CONTENT_URI,
                                         new String[]{"MAX(" + PrefLocationDO.LOCATIONID + ") AS " + PrefLocationDO.MAXLOCATIONID},
                                         null,
@@ -241,8 +240,8 @@ public class LocationSearchActivity extends BaseActivity implements
                                 objPrefLocationDO.LocationId = locationId;
                                 objPrefLocationDO.LocationName = locationName;
                                 objPrefLocationDO.Address = address;
-                                objPrefLocationDO.Latitude = currentLatLng.latitude;
-                                objPrefLocationDO.Longitude = currentLatLng.longitude;
+                                objPrefLocationDO.Latitude = saveLatLng.latitude;
+                                objPrefLocationDO.Longitude = saveLatLng.longitude;
                                 objPrefLocationDO.Radius = radius;
 
                                 Bundle bundle = new Bundle();
