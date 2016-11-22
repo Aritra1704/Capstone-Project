@@ -80,7 +80,7 @@ public class DetectedIntentService extends IntentService {
         LogUtils.infoLog(TAG, actiRecog);
 
         date = CalendarUtils.getDateinPattern(CalendarUtils.DATE_FORMAT1);
-        time = CalendarUtils.getDateinPattern(CalendarUtils.TIME_SEC_FORMAT);
+        time = CalendarUtils.getDateinPattern(AppConstant.GEO_FENCE_TIMESEC_FORMAT);
 
         ContentValues cValues = new ContentValues();
         cValues.put(ActivityRecogDO.LOCATIONID, locationID);
@@ -95,11 +95,13 @@ public class DetectedIntentService extends IntentService {
                 ActivityRecogDO.LOCATIONNAME + GCCPConstants.TABLE_QUES + GCCPConstants.TABLE_AND +
                 ActivityRecogDO.EVENT + GCCPConstants.TABLE_QUES + GCCPConstants.TABLE_AND +
                 ActivityRecogDO.OCCURANCEDATE + GCCPConstants.TABLE_QUES + GCCPConstants.TABLE_AND +
-                ActivityRecogDO.OCCURANCETIME + GCCPConstants.TABLE_QUES,
+                GCCPConstants.TABLE_FTTIME + ActivityRecogDO.OCCURANCETIME + GCCPConstants.TABLE_IN_ENDBRACKET +
+                GCCPConstants.TABLE_QUES +
+                GCCPConstants.TABLE_FTTIME + GCCPConstants.TABLE_QUES + GCCPConstants.TABLE_IN_ENDBRACKET,
                 new String[]{name, event, date, time});
 
         if(update < 1) {
-            AppConstant.writeFile("\nInsert: locationID: " + locationID +
+            AppConstant.writeFile("\nDetected Insert: locationID: " + locationID +
                     " name: " + name +
                     " event: " + event +
                     " date: " + date +
@@ -109,7 +111,7 @@ public class DetectedIntentService extends IntentService {
             Uri uri = getContentResolver().insert(GCCPConstants.CONTENT_URI_ACTI_RECOG, cValues);
             removeActivityUpdates();
         } else {
-            AppConstant.writeFile("\nUpdate: locationID: " + locationID +
+            AppConstant.writeFile("\nDetected Update: locationID: " + locationID +
                     " name: " + name +
                     " event: " + event +
                     " date: " + date +

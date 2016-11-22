@@ -38,6 +38,8 @@ public class AppConstant {
 
     public static final long DETECTION_INTERVAL_IN_MILLISECONDS = 1000;
 
+    public static final String GEO_FENCE_TIMESEC_FORMAT = "HH:mm:ss";
+
     public static final String ACTION_REFRESH      = "ACTION_REFRESH";
     public static final String EXTERNAL_FOLDER     = "/GeoCare/";
     public static final String EXTERNAL_FILENAME   = "GeoCare.txt";

@@ -33,7 +33,7 @@ public class GCCPConstants {
     public static final String TABLE_LEFT_OUTER_JOIN = " LEFT OUTER JOIN ";
     public static final String TABLE_ON = " ON ";
     public static final String TABLE_DOT = ".";
-    public static final String TABLE_EQUAL = "=";
+    public static final String TABLE_EQUAL = " = ";
     public static final String TABLE_WHERE = " WHERE ";
     public static final String TABLE_AND = " AND ";
     public static final String TABLE_OR = " OR ";
@@ -49,6 +49,8 @@ public class GCCPConstants {
     public static final String TABLE_ORDER_BY  = " ORDER BY ";
     public static final String TABLE_ASC  = " ASC ";
     public static final String TABLE_DESC  = " DESC ";
+    public static final String TABLE_FTTIME  = " strftime('%H %M', ";
+    public static final String TABLE_IN_ENDBRACKET  = " ) ";
 
     public static final String CONTENT = "content://";
     public static final Uri BASE_CONTENT_URI = Uri.parse(CONTENT + CONTENT_AUTHORITY);

@@ -232,7 +232,7 @@ public class GeoFenceActivity extends BaseActivity implements
             case ApplicationInstance.LOADER_FETCH_ALL_LOCATION :
                 return new CursorLoader(this, GCCPConstants.CONTENT_URI_SAVED_LOC,
                         new String[]{PrefLocationDO.LOCATIONID, PrefLocationDO.LOCATIONNAME, PrefLocationDO.ADDRESS,
-                                PrefLocationDO.LATITUDE, PrefLocationDO.LONGITUDE},
+                                PrefLocationDO.LATITUDE, PrefLocationDO.LONGITUDE, PrefLocationDO.RADIUS},
                         null,
                         null,
                         null);
@@ -257,6 +257,7 @@ public class GeoFenceActivity extends BaseActivity implements
                             objPrefLocationDO.Address = cursor.getString(cursor.getColumnIndex(PrefLocationDO.ADDRESS));
                             objPrefLocationDO.Latitude = StringUtils.getDouble(cursor.getString(cursor.getColumnIndex(PrefLocationDO.LATITUDE)));
                             objPrefLocationDO.Longitude = StringUtils.getDouble(cursor.getString(cursor.getColumnIndex(PrefLocationDO.LONGITUDE)));
+                            objPrefLocationDO.Radius = StringUtils.getInt(cursor.getString(cursor.getColumnIndex(PrefLocationDO.RADIUS)));
 
                             arrPrefLocationDO.add(objPrefLocationDO);
                         } while (cursor.moveToNext());
@@ -321,7 +322,7 @@ public class GeoFenceActivity extends BaseActivity implements
                     CircleOptions circleOptions = new CircleOptions()
                             .clickable(true)
                             .center(latLngFarm)
-                            .radius(AppConstant.GEOFENCE_RADIUS_IN_METERS)
+                            .radius(objPrefLocationDO.Radius)
                             .fillColor(ColorUtils.getColor(GeoFenceActivity.this, R.color.color_Light_Pink))
                             .strokeColor(ColorUtils.getColor(GeoFenceActivity.this, R.color.color_SkyBlue))
                             .strokeWidth(2);

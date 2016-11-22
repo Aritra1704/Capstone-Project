@@ -130,7 +130,7 @@ public class GeofenceTransitionsIntentService extends IntentService {
                 AppConstant.writeFile("\n" + objPrefLocationDO.Address);
 
                 String date = CalendarUtils.getDateinPattern(CalendarUtils.DATE_FORMAT1);
-                String time = CalendarUtils.getDateinPattern(CalendarUtils.TIME_SEC_FORMAT);
+                String time = CalendarUtils.getDateinPattern(AppConstant.GEO_FENCE_TIMESEC_FORMAT);
                 String locationname = geofenceEvent[1];
                 String event = geofenceEvent[0];
                 Uri uri = null;
@@ -150,9 +150,17 @@ public class GeofenceTransitionsIntentService extends IntentService {
                         GeoFenceLocationDO.LOCATIONNAME + GCCPConstants.TABLE_QUES + GCCPConstants.TABLE_AND +
                         GeoFenceLocationDO.EVENT + GCCPConstants.TABLE_QUES + GCCPConstants.TABLE_AND +
                         GeoFenceLocationDO.OCCURANCEDATE + GCCPConstants.TABLE_QUES + GCCPConstants.TABLE_AND +
-                        GeoFenceLocationDO.OCCURANCETIME + GCCPConstants.TABLE_QUES,
+                        GCCPConstants.TABLE_FTTIME + GeoFenceLocationDO.OCCURANCETIME + GCCPConstants.TABLE_IN_ENDBRACKET +
+                        GCCPConstants.TABLE_QUES +
+                        GCCPConstants.TABLE_FTTIME + GCCPConstants.TABLE_QUES + GCCPConstants.TABLE_IN_ENDBRACKET,
                         new String[]{locationname, event, date, time});
                 if(update < 1) {
+                    AppConstant.writeFile("\nGeofenceTransition Insert: " +
+                            " name: " + locationname +
+                            " event: " + event +
+                            " date: " + date +
+                            " time: " + time);
+
                     uri = getContentResolver().insert(GCCPConstants.CONTENT_URI_GEOFENCE_LOC, cValues);
 
                     Intent intent = new Intent(getApplicationContext(), ActivityRecogNotiService.class);
@@ -162,6 +170,12 @@ public class GeofenceTransitionsIntentService extends IntentService {
                     intent.putExtra(ActivityRecogDO.OCCURANCEDATE, date);
                     intent.putExtra(ActivityRecogDO.OCCURANCETIME, time);
                     startService(intent);
+                } else {
+                    AppConstant.writeFile("\nGeofenceTransition Update: " +
+                            " name: " + locationname +
+                            " event: " + event +
+                            " date: " + date +
+                            " time: " + time);
                 }
                 cursor.close();
             }

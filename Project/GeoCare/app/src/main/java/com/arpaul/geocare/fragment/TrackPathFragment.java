@@ -120,14 +120,15 @@ public class TrackPathFragment extends Fragment implements LoaderManager.LoaderC
                         GCCPConstants.AS_GEOFENCE_LOCATION_TABLE + GCCPConstants.TABLE_DOT + GeoFenceLocationDO.OCCURANCEDATE + GCCPConstants.TABLE_EQUAL +
                         GCCPConstants.AS_ACTI_RECOG_TABLE_TABLE + GCCPConstants.TABLE_DOT + ActivityRecogDO.OCCURANCEDATE + GCCPConstants.TABLE_AND +
                         //based on occurance time
-                        GCCPConstants.AS_GEOFENCE_LOCATION_TABLE + GCCPConstants.TABLE_DOT + GeoFenceLocationDO.OCCURANCETIME + GCCPConstants.TABLE_EQUAL +
-                        GCCPConstants.AS_ACTI_RECOG_TABLE_TABLE + GCCPConstants.TABLE_DOT + ActivityRecogDO.OCCURANCETIME +
+                        GCCPConstants.TABLE_FTTIME + GCCPConstants.AS_GEOFENCE_LOCATION_TABLE + GCCPConstants.TABLE_DOT + GeoFenceLocationDO.OCCURANCETIME + GCCPConstants.TABLE_IN_ENDBRACKET +
+                        GCCPConstants.TABLE_EQUAL +
+                        GCCPConstants.TABLE_FTTIME + GCCPConstants.AS_ACTI_RECOG_TABLE_TABLE + GCCPConstants.TABLE_DOT + ActivityRecogDO.OCCURANCETIME + GCCPConstants.TABLE_IN_ENDBRACKET +
 
                         GCCPConstants.TABLE_ORDER_BY +
                         GCCPConstants.AS_GEOFENCE_LOCATION_TABLE + GCCPConstants.TABLE_DOT + GeoFenceLocationDO.OCCURANCEDATE +
                         GCCPConstants.TABLE_DESC);
 
-//                LogUtils.infoLog("QUERY_FARM_LIST", queryBuilder.getTables());
+                LogUtils.infoLog("QUERY_Geofence", queryBuilder.getTables());
 
                 return new CursorLoader(getActivity(), GCCPConstants.CONTENT_URI_RELATIONSHIP_JOIN,
                         new String[]{GCCPConstants.AS_GEOFENCE_LOCATION_TABLE + GCCPConstants.TABLE_DOT + GeoFenceLocationDO.LOCATIONID,
