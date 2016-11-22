@@ -28,6 +28,7 @@ public class DetectedIntentService extends IntentService {
     protected static final  String TAG = "DetectedIntentService";
     private String name, event, date, time;
     private int locationID;
+    private Resources resources;
 
     public DetectedIntentService(){
         super(TAG);
@@ -36,6 +37,7 @@ public class DetectedIntentService extends IntentService {
     @Override
     protected void onHandleIntent(Intent intent) {
 
+        resources = this.getResources();
         if(intent.hasExtra(ActivityRecogDO.LOCATIONID)) {
             locationID = intent.getExtras().getInt(ActivityRecogDO.LOCATIONID, 0);
             name = intent.getExtras().getString(ActivityRecogDO.LOCATIONNAME);
@@ -53,8 +55,18 @@ public class DetectedIntentService extends IntentService {
         ArrayList<DetectedActivity> detectedActivities = (ArrayList) result.getProbableActivities();
 
         String actiRecog = "";
+        int choice = 2;
         for(DetectedActivity thisActivity: detectedActivities){
-            actiRecog +=  getActivityString(thisActivity.getType()) + thisActivity.getConfidence() + "%\n";
+            if(thisActivity.getConfidence() >= 50 &&
+                    !getActivityString(thisActivity.getType()).equalsIgnoreCase(resources.getString(R.string.unknown))) {
+                actiRecog =  getActivityString(thisActivity.getType()) + ": " + thisActivity.getConfidence() + "%\n";
+                break;
+            } else if(thisActivity.getConfidence() < 50 &&
+                    !getActivityString(thisActivity.getType()).equalsIgnoreCase(resources.getString(R.string.unknown)) &&
+                    choice > 0) {
+                actiRecog +=  getActivityString(thisActivity.getType()) + ": " + thisActivity.getConfidence() + "%\n";
+                choice--;
+            }
         }
         // Log each activity.
         LogUtils.infoLog(TAG, actiRecog);
@@ -85,7 +97,6 @@ public class DetectedIntentService extends IntentService {
      * Returns a human readable String corresponding to a detected activity type.
      */
     public String getActivityString(int detectedActivityType) {
-        Resources resources = this.getResources();
         switch(detectedActivityType) {
             case DetectedActivity.IN_VEHICLE:
                 return resources.getString(R.string.in_vehicle);

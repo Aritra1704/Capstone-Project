@@ -129,26 +129,41 @@ public class GeofenceTransitionsIntentService extends IntentService {
 
                 AppConstant.writeFile("\n" + objPrefLocationDO.Address);
 
+                String date = CalendarUtils.getDateinPattern(CalendarUtils.DATE_FORMAT1);
+                String time = CalendarUtils.getDateinPattern(CalendarUtils.TIME_SEC_FORMAT);
+                String locationname = geofenceEvent[1];
+                String event = geofenceEvent[0];
+                Uri uri = null;
+
                 ContentValues cValues = new ContentValues();
                 cValues.put(GeoFenceLocationDO.LOCATIONID, objPrefLocationDO.LocationId);
-                cValues.put(GeoFenceLocationDO.LOCATIONNAME, geofenceEvent[1]);
+                cValues.put(GeoFenceLocationDO.LOCATIONNAME, locationname);
                 cValues.put(GeoFenceLocationDO.ADDRESS, objPrefLocationDO.Address);
                 cValues.put(GeoFenceLocationDO.LATITUDE, position.getLatitude());
                 cValues.put(GeoFenceLocationDO.LONGITUDE, position.getLongitude());
-                cValues.put(GeoFenceLocationDO.EVENT, geofenceEvent[0]);
-                cValues.put(GeoFenceLocationDO.OCCURANCEDATE, CalendarUtils.getDateinPattern(CalendarUtils.DATE_FORMAT1));
-                cValues.put(GeoFenceLocationDO.OCCURANCETIME, CalendarUtils.getDateinPattern(CalendarUtils.TIME_SEC_FORMAT));
+                cValues.put(GeoFenceLocationDO.EVENT, event);
+                cValues.put(GeoFenceLocationDO.OCCURANCEDATE, date);
+                cValues.put(GeoFenceLocationDO.OCCURANCETIME, time);
 
-                Uri uri = getContentResolver().insert(GCCPConstants.CONTENT_URI_GEOFENCE_LOC, cValues);
+                int update = getContentResolver().update(GCCPConstants.CONTENT_URI_GEOFENCE_LOC,
+                        cValues,
+                        GeoFenceLocationDO.LOCATIONNAME + GCCPConstants.TABLE_QUES + GCCPConstants.TABLE_AND +
+                        GeoFenceLocationDO.EVENT + GCCPConstants.TABLE_QUES + GCCPConstants.TABLE_AND +
+                        GeoFenceLocationDO.OCCURANCEDATE + GCCPConstants.TABLE_QUES + GCCPConstants.TABLE_AND +
+                        GeoFenceLocationDO.OCCURANCETIME + GCCPConstants.TABLE_QUES,
+                        new String[]{locationname, event, date, time});
+                if(update <= 0) {
+                    uri = getContentResolver().insert(GCCPConstants.CONTENT_URI_GEOFENCE_LOC, cValues);
+
+                    Intent intent = new Intent(getApplicationContext(), ActivityRecogNotiService.class);
+                    intent.putExtra(ActivityRecogDO.LOCATIONID, objPrefLocationDO.LocationId);
+                    intent.putExtra(ActivityRecogDO.LOCATIONNAME, locationname);
+                    intent.putExtra(ActivityRecogDO.EVENT, event);
+                    intent.putExtra(ActivityRecogDO.OCCURANCEDATE, date);
+                    intent.putExtra(ActivityRecogDO.OCCURANCETIME, time);
+                    startService(intent);
+                }
                 cursor.close();
-
-                Intent intent = new Intent(getApplicationContext(), ActivityRecogNotiService.class);
-                intent.putExtra(ActivityRecogDO.LOCATIONID, objPrefLocationDO.LocationId);
-                intent.putExtra(ActivityRecogDO.LOCATIONNAME, geofenceEvent[1]);
-                intent.putExtra(ActivityRecogDO.EVENT, geofenceEvent[0]);
-                intent.putExtra(ActivityRecogDO.OCCURANCEDATE, CalendarUtils.getDateinPattern(CalendarUtils.DATE_FORMAT1));
-                intent.putExtra(ActivityRecogDO.OCCURANCETIME, CalendarUtils.getDateinPattern(CalendarUtils.TIME_SEC_FORMAT));
-                startService(intent);
             }
         }
     }
