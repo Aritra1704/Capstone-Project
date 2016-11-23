@@ -1,7 +1,10 @@
 package com.arpaul.geocare.fragment;
 
+import android.content.BroadcastReceiver;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
@@ -64,7 +67,10 @@ public class TrackPathFragment extends Fragment implements LoaderManager.LoaderC
     }
 
     private void loadData(){
-        getActivity().getSupportLoaderManager().initLoader(ApplicationInstance.LOADER_FETCH_TRACK_LOCATION, null, this);
+        if(getActivity().getSupportLoaderManager().getLoader(ApplicationInstance.LOADER_FETCH_TRACK_LOCATION) != null)
+            getActivity().getSupportLoaderManager().restartLoader(ApplicationInstance.LOADER_FETCH_TRACK_LOCATION, null, this);
+        else
+            getActivity().getSupportLoaderManager().initLoader(ApplicationInstance.LOADER_FETCH_TRACK_LOCATION, null, this);
     }
 
     private void bindControls(){
@@ -82,23 +88,9 @@ public class TrackPathFragment extends Fragment implements LoaderManager.LoaderC
     public void onResume() {
         super.onResume();
 
-        if(getActivity().getSupportLoaderManager().getLoader(ApplicationInstance.LOADER_FETCH_TRACK_LOCATION) != null)
-            getActivity().getSupportLoaderManager().restartLoader(ApplicationInstance.LOADER_FETCH_TRACK_LOCATION, null, this);
-        else
-            loadData();
+        loadData();
 
-
-
-//        ContentValues cValues = new ContentValues();
-//        cValues.put(ActivityRecogDO.LOCATIONID, 251);
-//        cValues.put(ActivityRecogDO.LOCATIONNAME, "Test");
-//        cValues.put(ActivityRecogDO.EVENT, "Test event");
-//        cValues.put(ActivityRecogDO.OCCURANCEDATE, "20-11-2016");
-//        cValues.put(ActivityRecogDO.OCCURANCETIME, "05:53");
-//        cValues.put(ActivityRecogDO.CURRENT_ACTIVITY, "Sleep");
-//
-//        Uri uri = getActivity().getContentResolver().insert(GCCPConstants.CONTENT_URI_ACTI_RECOG, cValues);
-
+        registerBroadcast();
     }
 
     @Override
@@ -218,6 +210,22 @@ public class TrackPathFragment extends Fragment implements LoaderManager.LoaderC
     public void onLoaderReset(Loader loader) {
 
     }
+
+    private void registerBroadcast(){
+        try {
+            IntentFilter intentFilter = new IntentFilter(AppConstant.ACTION_REFRESH_TRACK);
+            getActivity().registerReceiver(br_REFRESH, intentFilter);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    private BroadcastReceiver br_REFRESH = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            loadData();
+        }
+    };
 
     private void initialiseFragment(View view){
         fabGeoFence = (FloatingActionButton) view.findViewById(R.id.fabGeoFence);

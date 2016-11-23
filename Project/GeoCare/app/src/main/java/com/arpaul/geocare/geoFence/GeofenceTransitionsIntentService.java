@@ -73,7 +73,7 @@ public class GeofenceTransitionsIntentService extends IntentService {
             );
 
             // Send notification and log the transition details.
-            sendNotification(geofenceTransitionDetails);
+//            sendNotification(geofenceTransitionDetails);
             Log.i(TAG, geofenceTransitionDetails);
         } else {
             // Log the error.
@@ -151,7 +151,7 @@ public class GeofenceTransitionsIntentService extends IntentService {
                         GeoFenceLocationDO.EVENT + GCCPConstants.TABLE_QUES + GCCPConstants.TABLE_AND +
                         GeoFenceLocationDO.OCCURANCEDATE + GCCPConstants.TABLE_QUES + GCCPConstants.TABLE_AND +
                         GCCPConstants.TABLE_FTTIME + GeoFenceLocationDO.OCCURANCETIME + GCCPConstants.TABLE_IN_ENDBRACKET +
-                        GCCPConstants.TABLE_QUES +
+                        GCCPConstants.TABLE_EQUAL +
                         GCCPConstants.TABLE_FTTIME + GCCPConstants.TABLE_QUES + GCCPConstants.TABLE_IN_ENDBRACKET,
                         new String[]{locationname, event, date, time});
                 if(update < 1) {
@@ -178,11 +178,12 @@ public class GeofenceTransitionsIntentService extends IntentService {
                             " time: " + time);
                 }
                 cursor.close();
+                sendNotification(objPrefLocationDO.LocationId, event + ": " + locationname);
             }
         }
     }
 
-    private void sendNotification(String notificationDetails) {
+    private void sendNotification(int locationId, String notificationDetails) {
         // Create an explicit content Intent that starts the main Activity.
         Intent notificationIntent = new Intent(getApplicationContext(), GeoFenceActivity.class);
 
@@ -221,6 +222,6 @@ public class GeofenceTransitionsIntentService extends IntentService {
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
         // Issue the notification
-        mNotificationManager.notify(0, builder.build());
+        mNotificationManager.notify(locationId, builder.build());
     }
 }
