@@ -152,8 +152,8 @@ public class GeofenceTransitionsIntentService extends IntentService {
                         GeoFenceLocationDO.OCCURANCEDATE + GCCPConstants.TABLE_QUES + GCCPConstants.TABLE_AND +
                         GCCPConstants.TABLE_FTTIME + GeoFenceLocationDO.OCCURANCETIME + GCCPConstants.TABLE_IN_ENDBRACKET +
                         GCCPConstants.TABLE_EQUAL +
-                        GCCPConstants.TABLE_FTTIME + GCCPConstants.TABLE_QUES + GCCPConstants.TABLE_IN_ENDBRACKET,
-                        new String[]{locationname, event, date, time});
+                        GCCPConstants.TABLE_FTTIME + "'" + time + "'" + GCCPConstants.TABLE_IN_ENDBRACKET,
+                        new String[]{locationname, event, date});
                 if(update < 1) {
                     AppConstant.writeFile("\nGeofenceTransition Insert: " +
                             " name: " + locationname +

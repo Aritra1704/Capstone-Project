@@ -96,9 +96,9 @@ public class DetectedIntentService extends IntentService {
                 ActivityRecogDO.EVENT + GCCPConstants.TABLE_QUES + GCCPConstants.TABLE_AND +
                 ActivityRecogDO.OCCURANCEDATE + GCCPConstants.TABLE_QUES + GCCPConstants.TABLE_AND +
                 GCCPConstants.TABLE_FTTIME + ActivityRecogDO.OCCURANCETIME + GCCPConstants.TABLE_IN_ENDBRACKET +
-                GCCPConstants.TABLE_QUES +
-                GCCPConstants.TABLE_FTTIME + GCCPConstants.TABLE_QUES + GCCPConstants.TABLE_IN_ENDBRACKET,
-                new String[]{name, event, date, time});
+                GCCPConstants.TABLE_EQUAL +
+                GCCPConstants.TABLE_FTTIME + "'" + time + "'" + GCCPConstants.TABLE_IN_ENDBRACKET,
+                new String[]{name, event, date});
 
         if(update < 1) {
             AppConstant.writeFile("\nDetected Insert: locationID: " + locationID +
