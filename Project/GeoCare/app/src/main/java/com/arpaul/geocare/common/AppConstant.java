@@ -36,14 +36,14 @@ public class AppConstant {
 
     public static final long LOCATION_UPDATES_IN_SECONDS = 60;
 
-    public static final long DETECTION_INTERVAL_IN_MILLISECONDS = 1000;
+    public static final long DETECTION_INTERVAL_IN_MILLISECONDS = 0;
 
     public static final String GEO_FENCE_TIMESEC_FORMAT = "HH:mm:ss";
 
     public static final String ACTION_REFRESH               = "ACTION_REFRESH";
     public static final String ACTION_REFRESH_TRACK         = "ACTION_REFRESH_TRACK";
-    public static final String EXTERNAL_FOLDER     = "/GeoCare/";
-    public static final String EXTERNAL_FILENAME   = "GeoCare.txt";
+    public static final String EXTERNAL_FOLDER              = "/GeoCare/";
+    public static final String EXTERNAL_FILENAME            = "GeoCare.txt";
     public static FirebaseAuth mFirebaseAuth;
 
     public static final String KEY_ACTIVITY_NOTI        = "KEY_ACTIVITY_NOTI";

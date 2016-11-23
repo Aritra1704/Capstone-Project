@@ -79,8 +79,8 @@ public class DetectedIntentService extends IntentService {
         // Log each activity.
         LogUtils.infoLog(TAG, actiRecog);
 
-        date = CalendarUtils.getDateinPattern(CalendarUtils.DATE_FORMAT1);
-        time = CalendarUtils.getDateinPattern(AppConstant.GEO_FENCE_TIMESEC_FORMAT);
+//        date = CalendarUtils.getDateinPattern(CalendarUtils.DATE_FORMAT1);
+//        time = CalendarUtils.getDateinPattern(AppConstant.GEO_FENCE_TIMESEC_FORMAT);
 
         ContentValues cValues = new ContentValues();
         cValues.put(ActivityRecogDO.LOCATIONID, locationID);
